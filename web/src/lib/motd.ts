@@ -15,10 +15,14 @@ const small: PrettyTextComponent[] = [
 ]
 
 const xlOne: PrettyTextComponent[] = [
-    { text: "\u0097\u0083\u0083\u0083\u0083\u0083\u0083\u0083\u0083\u0083\u0083"},
+    { text: "\n \u0097\u0083\u0083\u0083\u0083\u0083\u0083\u0083\u0083\u0083\u0083"},
     { text: "\u0094", textColor: ColorBlits.black, backgroundColor: ColorBlits.white },
-    { text: "\n\u0095BlockChain"},
-    { text: "\u0095\n\u008a\u008f\u008f\u008f\u008f\u008f\u008f\u008f\u008f\u008f\u008f\u0085", textColor: ColorBlits.black, backgroundColor: ColorBlits.white}
+    { text: " \n \u0095BlockChain"},
+    { text: "\u0095", textColor: ColorBlits.black, backgroundColor: ColorBlits.white },
+    { text: " \n " },
+    { text: "\u008a\u008f\u008f\u008f\u008f\u008f\u008f\u008f\u008f\u008f\u008f\u0085", textColor: ColorBlits.black, backgroundColor: ColorBlits.white},
+    { text: " " },
+    { text: "\n\nWelcome"}
 ]
 
 const xlTwo: PrettyTextComponent[] = [
