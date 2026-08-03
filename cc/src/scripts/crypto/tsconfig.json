@@ -1,0 +1,15 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "../../../.."
+  },
+  "tstl": {
+    "luaBundle": "../../../dist/crypto.lua",
+    "luaBundleEntry": "./main.ts"
+  },
+  "include": [
+    "./**/*",
+    "../../shared/**/*",
+    "../../../../common/**/*"
+  ]
+}

@@ -1,0 +1,1 @@
+/// <reference path="crypto.d.ts"/>

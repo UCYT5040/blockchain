@@ -13,7 +13,8 @@
     "types": [
       "@jackmacwindows/lua-types/cc-5.2",
       "@jackmacwindows/craftos-types",
-      "@jackmacwindows/cc-types"
+      "@jackmacwindows/cc-types",
+      "@UCYT5040/blockchain-types"
     ]
   },
   "tstl": {

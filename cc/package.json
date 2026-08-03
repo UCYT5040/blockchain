@@ -12,7 +12,8 @@
     "@jackmacwindows/lua-types": "^2.13.2",
     "@jackmacwindows/typescript-to-lua": "^1.22.0",
     "@jackmacwindows/craftos-types": "file:types/craftos",
-    "@jackmacwindows/cc-types": "file:types/cc"
+    "@jackmacwindows/cc-types": "file:types/cc",
+    "@UCYT5040/blockchain-types": "file:types/blockchain"
   },
   "author": "JackMacWindows",
   "license": "MIT"
