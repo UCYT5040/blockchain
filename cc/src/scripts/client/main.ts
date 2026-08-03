@@ -1,6 +1,8 @@
 import { write, writeLine } from "@shared/term";
 import { getRuntimeConfig, saveRuntimeConfig } from "./config";
 import { SERVER_ADDRESS } from "@shared/const";
+import { ClientAPI } from "./api";
+import { pretty_print } from "cc.pretty";
 
 const REGISTRATION_SITE = ''; // TODO: Add registration site
 
@@ -25,16 +27,52 @@ Enter your Client ID: `);
         write(term, `Enter your Master Key: `);
         const masterKey = read('*');
 
-        // Save config
-        saveRuntimeConfig({
+        config = {
             clientId,
             masterKey,
             serverAddress: SERVER_ADDRESS
-        });
+        }
+
+        // Save config
+        saveRuntimeConfig(config);
 
         writeLine(term, 'Saved to `/config.json`.');
     }
 }
 
-writeLine(term, 'Client has not been implemented yet.');
+if (!config) throw new Error("Config not found. Please register this computer.");
 
+// Try to send a request for contact data
+const client = new ClientAPI(config.clientId, config.masterKey, config.serverAddress);
+
+function main() {
+    parallel.waitForAny(
+        () => client.listen(),
+        () => {
+            let resData: unknown;
+            let reqErr: unknown;
+            let finished = false;
+
+            client.request("contacts:get")
+                .then((res) => {
+                    resData = res;
+                    finished = true;
+                })
+                .catch((err) => {
+                    reqErr = err;
+                    finished = true;
+                });
+
+            while (!finished) {
+                os.sleep(0.05);
+            }
+
+            if (reqErr) throw reqErr;
+            pretty_print(resData);
+        }
+    );
+}
+
+main();
+
+sleep(10);

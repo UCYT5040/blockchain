@@ -57,7 +57,8 @@ export function bytesToHex(bytes: number[]): string {
 export function hexToBytes(hex: string): number[] {
   const bytes: number[] = [];
   for (let i = 0; i < hex.length; i += 2) {
-    bytes.push(parseInt(hex.substring(i, i + 2), 16));
+    const val = parseInt(hex.substring(i, i + 2), 16);
+    bytes.push(isNaN(val) ? 0 : val);
   }
   return bytes;
 }
