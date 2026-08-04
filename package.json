@@ -1,0 +1,13 @@
+{
+	"name": "blockchain-workspace",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"format": "prettier --write .",
+		"format:check": "prettier --check ."
+	},
+	"devDependencies": {
+		"prettier": "^3.8.3",
+		"prettier-plugin-svelte": "^4.1.0"
+	}
+}

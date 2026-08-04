@@ -1,0 +1,12 @@
+# Node & Build artifacts
+node_modules/
+dist/
+.svelte-kit/
+web/.svelte-kit/
+web/build/
+
+# Lockfiles
+package-lock.json
+
+# Static assets
+web/static/

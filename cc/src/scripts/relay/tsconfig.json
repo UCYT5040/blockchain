@@ -4,7 +4,7 @@
 		"rootDir": "../../../.."
 	},
 	"tstl": {
-		"luaBundle": "../../../dist/protocol.lua",
+		"luaBundle": "../../../dist/relay.lua",
 		"luaBundleEntry": "./main.ts"
 	},
 	"include": ["./**/*", "../../shared/**/*", "../../../../common/**/*"]

@@ -1,9 +1,11 @@
 {
-    "name": "@UCYT5040/blockchain-types",
-    "version": "1.0.0",
-    "description": "TypeScript type definitions for Blockchain.",
-    "types": "index.d.ts",
-    "files": ["./*.d.ts"],
-    "author": "Jeremiah Saunders",
-    "license": "MIT"
+	"name": "@UCYT5040/blockchain-types",
+	"version": "1.0.0",
+	"description": "TypeScript type definitions for Blockchain.",
+	"types": "index.d.ts",
+	"files": [
+		"./*.d.ts"
+	],
+	"author": "Jeremiah Saunders",
+	"license": "MIT"
 }

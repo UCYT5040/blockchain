@@ -1,15 +1,16 @@
 {
-  "extends": "../../../tsconfig.base.json",
-  "compilerOptions": {
-    "rootDir": "../../../.."
-  },
-  "tstl": {
-    "luaBundle": "../../../dist/server.lua",
-    "luaBundleEntry": "./main.ts"
-  },
-  "include": [
-    "./**/*",
-    "../../shared/**/*",
-    "../../../../common/**/*"
-, "../../../types/blockchain/crypto.d.ts"  ]
+	"extends": "../../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "../../../.."
+	},
+	"tstl": {
+		"luaBundle": "../../../dist/server.lua",
+		"luaBundleEntry": "./main.ts"
+	},
+	"include": [
+		"./**/*",
+		"../../shared/**/*",
+		"../../../../common/**/*",
+		"../../../types/blockchain/crypto.d.ts"
+	]
 }

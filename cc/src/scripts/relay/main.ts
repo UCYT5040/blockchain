@@ -1,0 +1,3 @@
+// ComputerCraft Script: relay
+// Write your code here...
+print('Hello from relay!');

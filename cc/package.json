@@ -1,20 +1,20 @@
 {
-  "name": "cc-tstl-template",
-  "version": "1.113.1",
-  "description": "Template project for ComputerCraft programs written in TypeScript.",
-  "main": "main.ts",
-  "scripts": {
-    "build": "node build.js",
-    "create": "node create-script.js"
-  },
-  "devDependencies": {
-    "typescript": "^5.1.0",
-    "@jackmacwindows/lua-types": "^2.13.2",
-    "@jackmacwindows/typescript-to-lua": "^1.22.0",
-    "@jackmacwindows/craftos-types": "file:types/craftos",
-    "@jackmacwindows/cc-types": "file:types/cc",
-    "@UCYT5040/blockchain-types": "file:types/blockchain"
-  },
-  "author": "JackMacWindows",
-  "license": "MIT"
+	"name": "cc-tstl-template",
+	"version": "1.113.1",
+	"description": "Template project for ComputerCraft programs written in TypeScript.",
+	"main": "main.ts",
+	"scripts": {
+		"build": "node build.js",
+		"create": "node create-script.js"
+	},
+	"devDependencies": {
+		"typescript": "^5.1.0",
+		"@jackmacwindows/lua-types": "^2.13.2",
+		"@jackmacwindows/typescript-to-lua": "^1.22.0",
+		"@jackmacwindows/craftos-types": "file:types/craftos",
+		"@jackmacwindows/cc-types": "file:types/cc",
+		"@UCYT5040/blockchain-types": "file:types/blockchain"
+	},
+	"author": "JackMacWindows",
+	"license": "MIT"
 }
