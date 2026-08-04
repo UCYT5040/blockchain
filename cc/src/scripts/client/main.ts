@@ -5,6 +5,7 @@ import { ClientAPI } from "./api";
 import { pretty_print } from "cc.pretty";
 import { displayMOTD } from "@shared/motd";
 import { BlitData } from "@common/prettyText";
+import { initChatListener, openChatMenu } from "./chat";
 
 const REGISTRATION_SITE = ''; // TODO: Add registration site
 
@@ -42,42 +43,61 @@ Enter your Client ID: `);
     }
 }
 
-if (!config) throw new Error("Config not found. Please register this computer.");
+if (!config) error("Config not found. Please register this computer.");
 
-// Try to send a request for contact data
 const client = new ClientAPI(config.clientId, config.masterKey, config.serverAddress);
 
-function main() {
-    parallel.waitForAny(
-        () => client.listen(),
-        () => {
-            let resData: unknown;
-            let reqErr: unknown;
-            let finished = false;
+// Initialize background P2P chat listener
+initChatListener(client);
 
-            client.request("motd:get")
-                .then((res) => {
-                    resData = res;
-                    finished = true;
-                })
-                .catch((err) => {
-                    reqErr = err;
-                    finished = true;
-                });
+let motd: BlitData[] | null = null;
+let motdLoaded = false;
 
-            while (!finished) {
-                os.sleep(0.05);
-            }
-
-            if (reqErr) throw reqErr;
-
-            const data = resData as { motd?: BlitData[] };
-
-            displayMOTD(term, data.motd);
-        }
-    );
+function fetchMOTD(): void {
+    client.request("motd:get")
+        .then((res) => {
+            const data = res as { motd?: BlitData[] };
+            motd = data.motd || null;
+            motdLoaded = true;
+        })
+        .catch(() => {
+            motdLoaded = true;
+        });
 }
 
-main();
+function mainUI(): void {
+    fetchMOTD();
 
-sleep(10);
+    while (!motdLoaded) {
+        os.sleep(0.05);
+    }
+
+    menu();
+}
+
+function menu(): void {
+    term.clear();
+    term.setCursorPos(1, 1);
+    if (motd) displayMOTD(term, motd);
+
+    writeLine(term, '[1] Chats');
+    writeLine(term, '[2] Exit');
+    write(term, 'Select option: ');
+
+    const selection = read();
+
+    if (selection === '1') {
+        openChatMenu(client);
+        menu();
+    } else if (selection === '2') {
+        os.shutdown();
+    } else {
+        menu();
+    }
+}
+
+parallel.waitForAll(
+    () => client.listen(),
+    mainUI
+);
+

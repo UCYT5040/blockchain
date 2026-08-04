@@ -45,6 +45,25 @@ declare module "protocol" {
         content: string;
     }
 
+    export interface P2PTicket {
+  sessionKey: string;
+  initiatorId: string;
+  timestamp: number;
+  ttl: number;
+}
+
+export interface TicketResponseBody {
+  targetId: string;
+  sessionKey: string;
+  ticketForTarget: string;
+  ticketIv: string;
+}
+
+export interface P2PHandshakePayload {
+  ticket: string;
+  iv: string;
+}
+
     export class NetworkAdapter {
         constructor(channel?: number);
         public sendPacket(packet: WirePacket): void;
@@ -62,5 +81,23 @@ declare module "protocol" {
         public unpackPayload<T>(packet: WirePacket, keyHex: string): T | null;
         public registerPendingRequest(nonce: string, callback: (res: RPCResponsePayload) => void): void;
         public handleResponse(responsePayload: RPCResponsePayload): void;
+        public createResponsePacket(
+            targetId: string,
+            replyToNonce: string,
+            success: boolean,
+            data?: unknown,
+            error?: string,
+            keyHex?: string
+        ): WirePacket;
+        public createDataPacket(
+            targetId: string,
+            payload: DirectMessagePayload,
+            keyHex: string
+        ): WirePacket;
+        public createHandshakePacket(
+            targetId: string,
+            ticket: string,
+            ticketIv: string
+        ): WirePacket;
     }
 }

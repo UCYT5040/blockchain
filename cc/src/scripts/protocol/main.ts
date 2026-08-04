@@ -27,6 +27,25 @@ export interface DirectMessagePayload {
   content: string;
 }
 
+export interface P2PTicket {
+  sessionKey: string;
+  initiatorId: string;
+  timestamp: number;
+  ttl: number;
+}
+
+export interface TicketResponseBody {
+  targetId: string;
+  sessionKey: string;
+  ticketForTarget: string;
+  ticketIv: string;
+}
+
+export interface P2PHandshakePayload {
+  ticket: string;
+  iv: string;
+}
+
 export { 
   NetworkAdapter, 
   PacketCategory, 
@@ -108,5 +127,112 @@ export class ProtocolEngine {
       callback(responsePayload);
       this.pendingRequests.delete(responsePayload.replyToNonce);
     }
+  }
+
+  /**
+   * Constructs an encrypted Response WirePacket.
+   */
+  public createResponsePacket(
+    targetId: string,
+    replyToNonce: string,
+    success: boolean,
+    data?: unknown,
+    error?: string,
+    keyHex?: string
+  ): WirePacket {
+    if (!keyHex) throw new Error("Encryption key required for response creation.");
+
+    const responsePayload: RPCResponsePayload = {
+      replyToNonce,
+      success,
+      data,
+      error
+    };
+    const rawJson = textutils.serialiseJSON(responsePayload);
+    const iv = generateRandomHex(8);
+    const payloadEnvelope: EncryptedPayload = {
+      ciphertext: encryptText(rawJson, keyHex, iv),
+      iv
+    };
+
+    return {
+      header: {
+        v: 1,
+        category: PacketCategory.RESPONSE,
+        src: this.myId,
+        dst: targetId,
+        nonce: generateRandomHex(8),
+        ts: os.epoch("utc"),
+        ttl: 5,
+        enc: true
+      },
+      payload: payloadEnvelope
+    };
+  }
+
+  /**
+   * Constructs an encrypted Data WirePacket (direct message / chat).
+   */
+  public createDataPacket(
+    targetId: string,
+    payload: DirectMessagePayload,
+    keyHex: string
+  ): WirePacket {
+    if (!keyHex) throw new Error("Encryption key required for data packet creation.");
+
+    const rawJson = textutils.serialiseJSON(payload);
+    const iv = generateRandomHex(8);
+    const payloadEnvelope: EncryptedPayload = {
+      ciphertext: encryptText(rawJson, keyHex, iv),
+      iv
+    };
+
+    return {
+      header: {
+        v: 1,
+        category: PacketCategory.DATA,
+        src: this.myId,
+        dst: targetId,
+        nonce: generateRandomHex(8),
+        ts: os.epoch("utc"),
+        ttl: 5,
+        enc: true
+      },
+      payload: payloadEnvelope
+    };
+  }
+
+  /**
+   * Constructs a P2P Ticket Handshake Signal WirePacket.
+   * Delivered to target peer so target can decrypt the ticket using their master key.
+   */
+  public createHandshakePacket(
+    targetId: string,
+    ticket: string,
+    ticketIv: string
+  ): WirePacket {
+    const handshakePayload: P2PHandshakePayload = { ticket, iv: ticketIv };
+    const rawJson = textutils.serialiseJSON(handshakePayload);
+    
+    // We send payload as JSON string in ciphertext field (unencrypted wrapper around pre-encrypted ticket payload)
+    // or direct payload string since ticket ciphertext is already encrypted by server with target's master key.
+    const payloadEnvelope: EncryptedPayload = {
+      ciphertext: rawJson,
+      iv: ticketIv
+    };
+
+    return {
+      header: {
+        v: 1,
+        category: PacketCategory.SIGNAL,
+        src: this.myId,
+        dst: targetId,
+        nonce: generateRandomHex(8),
+        ts: os.epoch("utc"),
+        ttl: 5,
+        enc: false
+      },
+      payload: payloadEnvelope
+    };
   }
 }

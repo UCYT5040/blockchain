@@ -3,7 +3,7 @@ Used to relay messages between the web and Minecraft.
 Left: Advanced monitor (for logs)
 Top: Wireless modem
 */
-import { NetworkAdapter, ProtocolEngine, PacketCategory, RPCRequestPayload, RPCResponsePayload, WirePacket } from "protocol";
+import { NetworkAdapter, ProtocolEngine, PacketCategory, RPCRequestPayload, RPCResponsePayload, WirePacket, P2PTicket, TicketResponseBody } from "protocol";
 import { MOTDCache, ServerKeyCache } from "./cache";
 import { encryptText, blake2s, generateRandomHex } from "crypto";
 
@@ -54,8 +54,45 @@ function handleIncomingRequest(packet: WirePacket) {
   let errorMsg: string | undefined;
 
   switch (req.action) {
-    case "contacts:get":
-      responseData = { contacts: [{ id: "BOB_12", alias: "Bob" }, { id: "ALICE_84", alias: "Alice" }] };
+    case "ticket:get":
+      const targetId = req.params.targetId as string;
+      if (!targetId) {
+        success = false;
+        errorMsg = "No targetId provided";
+        break;
+      }
+
+      const targetMasterKey = keyCache.getMasterKey(targetId);
+      if (!targetMasterKey) {
+        success = false;
+        errorMsg = `User '${targetId}' not registered or offline`;
+        break;
+      }
+
+      const sessionKey = generateRandomHex(16);
+      const ticketIv = generateRandomHex(8);
+
+      const ticketObj: P2PTicket = {
+        sessionKey,
+        initiatorId: clientId,
+        timestamp: os.epoch("utc"),
+        ttl: 1000 * 60 * 60 * 1 // 1 hour
+      }
+
+      const ticketCiphertext = encryptText(
+        textutils.serialiseJSON(ticketObj),
+        targetMasterKey,
+        ticketIv
+      )
+
+      const resBody: TicketResponseBody = {
+        targetId,
+        sessionKey,
+        ticketForTarget: ticketCiphertext,
+        ticketIv
+      };
+
+      responseData = resBody;
       break;
     case "motd:get":
       const motd = motdCache.getMOTD();
