@@ -3,6 +3,8 @@ import { getRuntimeConfig, saveRuntimeConfig } from "./config";
 import { SERVER_ADDRESS } from "@shared/const";
 import { ClientAPI } from "./api";
 import { pretty_print } from "cc.pretty";
+import { displayMOTD } from "@shared/motd";
+import { BlitData } from "@common/prettyText";
 
 const REGISTRATION_SITE = ''; // TODO: Add registration site
 
@@ -53,7 +55,7 @@ function main() {
             let reqErr: unknown;
             let finished = false;
 
-            client.request("contacts:get")
+            client.request("motd:get")
                 .then((res) => {
                     resData = res;
                     finished = true;
@@ -68,7 +70,10 @@ function main() {
             }
 
             if (reqErr) throw reqErr;
-            pretty_print(resData);
+
+            const data = resData as { motd?: BlitData[] };
+
+            displayMOTD(term, data.motd);
         }
     );
 }

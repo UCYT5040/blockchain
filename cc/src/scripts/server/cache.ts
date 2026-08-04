@@ -1,3 +1,4 @@
+import { BlitData } from "@common/prettyText";
 import { SERVER_URL } from "@shared/const";
 
 interface CachedKey {
@@ -69,5 +70,63 @@ export class ServerKeyCache {
 
     public evictAll(): void {
         this.cache.clear();
+    }
+}
+
+export class MOTDCache {
+    private motd: BlitData[];
+    private expiresAt: number;
+    private readonly ttlMs: number;
+
+    constructor(ttlMinutes?: number) {
+        this.ttlMs = 1000 * 60 * (ttlMinutes || 10);
+        this.motd = [];
+        this.expiresAt = 0;
+    }
+
+    /**
+     * Gets the server's MOTD from the web server
+     * @returns The server's MOTD
+     */
+    public getMOTD(): BlitData[] | null {
+        const now = os.epoch("utc");
+
+        if (this.motd && this.expiresAt > now) {
+            return this.motd;
+        } else {
+            this.motd = [];
+            this.expiresAt = 0;
+        }
+
+        const [res, reason] = http.get(`${SERVER_URL}/motd/small?format=cc`);
+        if (!res) {
+            print(`[MOTDCache] http.get failed: ${reason}`);
+            return null;
+        }
+        const raw = res.readAll() as string;
+        res.close();
+
+        let motdData: BlitData[] | undefined;
+        try {
+            motdData = textutils.unserialiseJSON(raw) as BlitData[];
+        } catch {
+            print(`[MOTDCache] Failed to parse JSON: ${raw}`);
+            return null;
+        }
+
+        if (!motdData) {
+            print(`[MOTDCache] No motd returned: ${raw}`);
+            return null;
+        }
+
+        this.motd = motdData;
+        this.expiresAt = now + this.ttlMs;
+
+        return this.motd;
+    }
+
+    public evict(): void {
+        this.motd = [];
+        this.expiresAt = 0;
     }
 }

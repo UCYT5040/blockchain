@@ -4,7 +4,7 @@ Left: Advanced monitor (for logs)
 Top: Wireless modem
 */
 import { NetworkAdapter, ProtocolEngine, PacketCategory, RPCRequestPayload, RPCResponsePayload, WirePacket } from "protocol";
-import { ServerKeyCache } from "./cache";
+import { MOTDCache, ServerKeyCache } from "./cache";
 import { encryptText, blake2s, generateRandomHex } from "crypto";
 
 term.redirect(peripheral.wrap("left") as MonitorPeripheral);
@@ -13,6 +13,7 @@ const SERVER_ID = "SERVER";
 const network = new NetworkAdapter(100);
 const protocol = new ProtocolEngine(SERVER_ID);
 const keyCache = new ServerKeyCache("abc123");
+const motdCache = new MOTDCache();
 
 print(`[Server] Active and listening on channel 100...`);
 
@@ -55,6 +56,15 @@ function handleIncomingRequest(packet: WirePacket) {
   switch (req.action) {
     case "contacts:get":
       responseData = { contacts: [{ id: "BOB_12", alias: "Bob" }, { id: "ALICE_84", alias: "Alice" }] };
+      break;
+    case "motd:get":
+      const motd = motdCache.getMOTD();
+      if (!motd) {
+        success = false;
+        errorMsg = "Failed to get MOTD";
+      } else {
+        responseData = { motd };
+      }
       break;
     default:
       success = false;

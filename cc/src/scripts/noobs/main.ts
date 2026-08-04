@@ -7,34 +7,29 @@ Right: Advanced Monitor (MOTD xlOne)
 
 import { BlitData } from "@common/prettyText";
 import { SERVER_URL } from "@shared/const";
+import { displayMOTD } from "@shared/motd";
 
 // Get MOTDs
-
-const monitor1 = peripheral.wrap("right") as MonitorPeripheral;
-const monitor2 = peripheral.wrap("back") as MonitorPeripheral;
-
-function displayMOTD(monitor: MonitorPeripheral, motd: string) {
-    const [res, reason] = http.get(`${SERVER_URL}/motd/${motd}?format=cc`);
+function getAndDisplayMOTD(terminal: ITerminal, motd: string) {
+        const [res, reason] = http.get(`${SERVER_URL}/motd/${motd}?format=cc`);
     if (!res) {
-        monitor.write("Error fetching MOTD: " + reason);
+        terminal.write("Error fetching MOTD: " + reason);
         return;
     }
 
     const raw = res.readAll() as string;
     const motdData = textutils.unserialiseJSON(raw) as BlitData[];
 
-    monitor.clear();
-
-    let cursorY = 1;
-    for (const line of motdData) {
-        monitor.setCursorPos(1, cursorY);
-        monitor.blit(line.text, line.textColor, line.backgroundColor);
-        cursorY += 1;
-    }
+    displayMOTD(terminal, motdData);
 }
 
-displayMOTD(monitor1, "xlOne");
-displayMOTD(monitor2, "xlTwo");
+const monitor1 = peripheral.wrap("right") as MonitorPeripheral;
+const monitor2 = peripheral.wrap("back") as MonitorPeripheral;
+
+
+
+getAndDisplayMOTD(monitor1, "xlOne");
+getAndDisplayMOTD(monitor2, "xlTwo");
 
 /** @noSelf */
 interface PlayerDetector extends IPeripheral {
