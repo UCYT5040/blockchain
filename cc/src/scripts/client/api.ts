@@ -93,6 +93,8 @@ export class ClientAPI {
 			if (!packet) continue;
 			if (packet.header.dst !== this.clientId && packet.header.dst !== 'BROADCAST') continue;
 
+			if (this.protocol.isReplayOrExpired(packet)) continue;
+
 			const src = packet.header.src;
 			const category = packet.header.category;
 

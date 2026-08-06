@@ -44,14 +44,71 @@ export interface P2PHandshakePayload {
 	iv: string;
 }
 
+export class ReplayFilter {
+	private seenNonces = new Map<string, number>();
+	private maxAgeMs: number;
+
+	constructor(maxAgeMs = 60000) {
+		this.maxAgeMs = maxAgeMs;
+	}
+
+	/**
+	 * Checks if a packet is a replay or has an expired timestamp.
+	 * Returns true if packet is invalid (replay or expired).
+	 * If valid, records the nonce and returns false.
+	 */
+	public isReplayOrExpired(packet: WirePacket, now: number = os.epoch('utc')): boolean {
+		if (!packet || !packet.header) return true;
+
+		// Validate timestamp freshness
+		const age = Math.abs(now - packet.header.ts);
+		if (age > this.maxAgeMs) {
+			return true;
+		}
+
+		// Perform cleanup of expired nonces
+		this.cleanup(now);
+
+		// Check nonce uniqueness
+		if (this.seenNonces.has(packet.header.nonce)) {
+			return true;
+		}
+
+		// Record nonce with expiry time
+		this.seenNonces.set(packet.header.nonce, now + this.maxAgeMs);
+		return false;
+	}
+
+	/** Purges nonces whose expiration timestamp has passed */
+	public cleanup(now: number = os.epoch('utc')): void {
+		this.seenNonces.forEach((expiresAt, nonce) => {
+			if (now > expiresAt) {
+				this.seenNonces.delete(nonce);
+			}
+		});
+	}
+}
+
 export { NetworkAdapter, PacketCategory, PacketHeader, WirePacket, EncryptedPayload };
 
 export class ProtocolEngine {
 	private myId: string;
 	private pendingRequests = new Map<string, (response: RPCResponsePayload) => void>();
+	private replayFilter: ReplayFilter;
 
-	constructor(myId: string) {
+	constructor(myId: string, maxAgeMs = 60000) {
 		this.myId = myId;
+		this.replayFilter = new ReplayFilter(maxAgeMs);
+	}
+
+	/** Checks if an incoming packet is a duplicate replay or expired */
+	public isReplayOrExpired(packet: WirePacket): boolean {
+		return this.replayFilter.isReplayOrExpired(packet);
+	}
+
+	/** Returns the internal ReplayFilter instance */
+	public getReplayFilter(): ReplayFilter {
+		return this.replayFilter;
 	}
 
 	/**

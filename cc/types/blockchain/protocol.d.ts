@@ -64,6 +64,12 @@ declare module 'protocol' {
 		iv: string;
 	}
 
+	export class ReplayFilter {
+		constructor(maxAgeMs?: number);
+		public isReplayOrExpired(packet: WirePacket, now?: number): boolean;
+		public cleanup(now?: number): void;
+	}
+
 	export class NetworkAdapter {
 		constructor(channel?: number);
 		public sendPacket(packet: WirePacket): void;
@@ -71,7 +77,9 @@ declare module 'protocol' {
 	}
 
 	export class ProtocolEngine {
-		constructor(myId: string);
+		constructor(myId: string, maxAgeMs?: number);
+		public isReplayOrExpired(packet: WirePacket): boolean;
+		public getReplayFilter(): ReplayFilter;
 		public createRequestPacket(
 			targetId: string,
 			action: string,

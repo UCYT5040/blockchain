@@ -30,6 +30,11 @@ while (true) {
 	const packet = network.receivePacket();
 	if (!packet || packet.header.dst !== SERVER_ID) continue;
 
+	if (protocol.isReplayOrExpired(packet)) {
+		print(`[Server] Dropped duplicate/expired packet from ${packet.header.src} (nonce: ${packet.header.nonce})`);
+		continue;
+	}
+
 	// Process incoming Requests
 	if (packet.header.category === PacketCategory.REQUEST) {
 		handleIncomingRequest(packet);
