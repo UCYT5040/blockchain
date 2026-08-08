@@ -64,6 +64,12 @@ declare module 'protocol' {
 		iv: string;
 	}
 
+	export interface TestPacketPayload {
+		seq: number;
+		data: string;
+		ts: number;
+	}
+
 	export class ReplayFilter {
 		constructor(maxAgeMs?: number);
 		public isReplayOrExpired(packet: WirePacket, now?: number): boolean;
@@ -103,5 +109,7 @@ declare module 'protocol' {
 			keyHex: string
 		): WirePacket;
 		public createHandshakePacket(targetId: string, ticket: string, ticketIv: string): WirePacket;
+		public createTestPacket(targetId: string, seq?: number, data?: string): WirePacket;
+		public createTestResponsePacket(requestPacket: WirePacket, seq?: number): WirePacket;
 	}
 }

@@ -44,6 +44,12 @@ export interface P2PHandshakePayload {
 	iv: string;
 }
 
+export interface TestPacketPayload {
+	seq: number;
+	data: string;
+	ts: number;
+}
+
 export class ReplayFilter {
 	private seenNonces = new Map<string, number>();
 	private maxAgeMs: number;
@@ -277,6 +283,62 @@ export class ProtocolEngine {
 				enc: false
 			},
 			payload: payloadEnvelope
+		};
+	}
+
+	/**
+	 * Constructs an unencrypted SIGNAL Test Request WirePacket.
+	 */
+	public createTestPacket(targetId: string, seq = 1, data = 'ping'): WirePacket {
+		const testPayload: TestPacketPayload = {
+			seq,
+			data,
+			ts: os.epoch('utc')
+		};
+		const rawJson = textutils.serialiseJSON(testPayload);
+		return {
+			header: {
+				v: 1,
+				category: PacketCategory.SIGNAL,
+				src: this.myId,
+				dst: targetId,
+				nonce: generateRandomHex(8),
+				ts: os.epoch('utc'),
+				ttl: 5,
+				enc: false
+			},
+			payload: {
+				ciphertext: rawJson,
+				iv: ''
+			}
+		};
+	}
+
+	/**
+	 * Constructs an unencrypted SIGNAL Test Response WirePacket with constant "pong" payload data.
+	 */
+	public createTestResponsePacket(requestPacket: WirePacket, seq = 1): WirePacket {
+		const testPayload: TestPacketPayload = {
+			seq,
+			data: 'pong',
+			ts: os.epoch('utc')
+		};
+		const rawJson = textutils.serialiseJSON(testPayload);
+		return {
+			header: {
+				v: 1,
+				category: PacketCategory.SIGNAL,
+				src: this.myId,
+				dst: requestPacket.header.src,
+				nonce: generateRandomHex(8),
+				ts: os.epoch('utc'),
+				ttl: 5,
+				enc: false
+			},
+			payload: {
+				ciphertext: rawJson,
+				iv: ''
+			}
 		};
 	}
 }
