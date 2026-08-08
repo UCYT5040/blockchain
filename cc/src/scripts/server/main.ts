@@ -31,7 +31,9 @@ while (true) {
 	if (!packet || packet.header.dst !== SERVER_ID) continue;
 
 	if (protocol.isReplayOrExpired(packet)) {
-		print(`[Server] Dropped duplicate/expired packet from ${packet.header.src} (nonce: ${packet.header.nonce})`);
+		print(
+			`[Server] Dropped duplicate/expired packet from ${packet.header.src} (nonce: ${packet.header.nonce})`
+		);
 		continue;
 	}
 
