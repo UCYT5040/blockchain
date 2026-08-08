@@ -4,7 +4,7 @@ import { betterAuth } from 'better-auth';
 import { createAuthMiddleware } from 'better-auth/api';
 import { genericOAuth } from 'better-auth/plugins';
 import { sveltekitCookies } from 'better-auth/svelte-kit';
-import { upsertUserToAirtable } from './airtable';
+import { upsertUser } from './airtable';
 
 export const auth = betterAuth({
 	baseURL: 'http://localhost:5173', // TODO: Update or use env var or perhaps some Vite utility?
@@ -29,7 +29,7 @@ export const auth = betterAuth({
 			if (ctx.path.startsWith('/oauth2/callback/')) {
 				const user = ctx.context.newSession?.user;
 
-				await upsertUserToAirtable({
+				await upsertUser({
 					slackId: user!.slackId as string,
 					email: user!.email as string,
 					name: user!.name as string,

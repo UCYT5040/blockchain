@@ -24,13 +24,29 @@ interface UserProfileSync {
 	name: string;
 }
 
-export async function upsertUserToAirtable(data: UserProfileSync): Promise<void> {
+interface UserAirtableData {
+	id: string;
+	[key: string]: unknown;
+}
+
+export async function getUserBySlackID(slackId: string): Promise<UserAirtableData | null> {
 	const existingUsers = await users
 		.select({
 			maxRecords: 1,
-			filterByFormula: `{Slack ID} = "${data.slackId}"`
+			filterByFormula: `{Slack ID} = "${slackId}"`
 		})
 		.firstPage();
+	if (existingUsers.length === 0) {
+		return null;
+	}
+	return {
+		...existingUsers[0].fields,
+		id: existingUsers[0].id
+	};
+}
+
+export async function upsertUser(data: UserProfileSync): Promise<void> {
+	const existingUser = await getUserBySlackID(data.slackId);
 
 	const airtableData = {
 		'Slack ID': data.slackId,
@@ -40,9 +56,60 @@ export async function upsertUserToAirtable(data: UserProfileSync): Promise<void>
 		'YSWS Eligible': data.yswsEligible
 	};
 
-	if (existingUsers.length === 0) {
-		await users.create(airtableData);
+	if (existingUser) {
+		await users.update(existingUser.id, airtableData);
 	} else {
-		await users.update(existingUsers[0].id, airtableData);
+		await users.create(airtableData);
 	}
+}
+
+export async function getComputerByClientID(clientId: string) {
+	const computerResults = await computers
+		.select({
+			maxRecords: 1,
+			filterByFormula: `{Client ID} = "${clientId}"`
+		})
+		.firstPage();
+	if (computerResults.length === 0) {
+		return null;
+	}
+	return computerResults[0];
+}
+
+/**
+ * @param ownerSlackId Slack ID of the owner
+ * @param clientId Client ID of the computer (must be unique, this function will not check for duplicates)
+ * @param masterKey Master key of the computer
+ */
+export async function addComputer(
+	ownerSlackId: string,
+	clientId: string,
+	masterKey: string
+): Promise<void> {
+	const owner = await getUserBySlackID(ownerSlackId);
+	if (!owner) {
+		throw new Error(`No user with Slack ID ${ownerSlackId} found`);
+	}
+
+	await computers.create({
+		'Client ID': clientId,
+		'Master Key': masterKey,
+		Owner: [owner.id]
+	});
+}
+
+export async function getComputersByOwnerSlackID(ownerSlackId: string) {
+	const computerResults = await computers
+		.select({
+			filterByFormula: `{Slack ID (from Owner)} = "${ownerSlackId}"`
+		})
+		.all();
+	return computerResults;
+}
+
+/**
+ * @param id The Airtable record ID (not to be confused with the Client ID)
+ */
+export async function deleteComputerByID(id: string): Promise<void> {
+	await computers.destroy(id);
 }

@@ -33,6 +33,7 @@
 	},
 	"dependencies": {
 		"airtable": "^0.12.2",
-		"better-auth": "^1.6.26"
+		"better-auth": "^1.6.26",
+		"nanoid": "^6.0.1"
 	}
 }
