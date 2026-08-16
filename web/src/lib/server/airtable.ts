@@ -2,7 +2,8 @@ import {
 	AIRTABLE_API_KEY,
 	AIRTABLE_BASE,
 	AIRTABLE_TABLE_COMPUTERS,
-	AIRTABLE_TABLE_USERS
+	AIRTABLE_TABLE_USERS,
+	AIRTABLE_TABLE_CURRENCY
 } from '$env/static/private';
 import Airtable from 'airtable';
 
@@ -15,6 +16,8 @@ const base = airtable.base(AIRTABLE_BASE);
 export const users = base.table(AIRTABLE_TABLE_USERS);
 
 export const computers = base.table(AIRTABLE_TABLE_COMPUTERS);
+
+export const currency = base.table(AIRTABLE_TABLE_CURRENCY);
 
 interface UserProfileSync {
 	slackId: string;
@@ -112,4 +115,13 @@ export async function getComputersByOwnerSlackID(ownerSlackId: string) {
  */
 export async function deleteComputerByID(id: string): Promise<void> {
 	await computers.destroy(id);
+}
+
+export async function getCurrencyByUserSlackID(userSlackId: string) {
+	const results = await currency
+		.select({
+			filterByFormula: `OR({Slack ID (from From)} = "${userSlackId}", {Slack ID (from To)} = "${userSlackId}")`
+		})
+		.all();
+	return results;
 }
