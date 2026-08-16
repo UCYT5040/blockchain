@@ -1,20 +1,15 @@
 <script lang="ts">
-  import type { SvelteHTMLElements } from 'svelte/elements';
+	import type { SvelteHTMLElements } from 'svelte/elements';
 
 	type SVGProps = SvelteHTMLElements['svg'];
 
-  interface Props extends SVGProps {
+	interface Props extends SVGProps {
 		advanced?: boolean;
 		width?: number;
 		height?: number;
 	}
 
-	let {
-		advanced = false,
-		width = 600,
-		height = 400,
-		...otherProps
-	}: Props = $props();
+	let { advanced = false, width = 600, height = 400, ...otherProps }: Props = $props();
 
 	interface Rect {
 		x: number;

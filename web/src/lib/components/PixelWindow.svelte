@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount, type Snippet } from 'svelte';
 	import type { SvelteHTMLElements } from 'svelte/elements';
-	import PixelWindowBackground from './PixelWindowBackground.svelte';
+	import PixelBackground from './PixelBackground.svelte';
 
 	type DivProps = SvelteHTMLElements['div'];
 
@@ -30,7 +30,7 @@
 </script>
 
 <div {...otherProps} class={`pixel-window ${className ?? ''}`} bind:this={divElement} onresize={updateSize}>
-    <PixelWindowBackground {advanced} {width} {height} class="pixel-window-background" />
+    <PixelBackground {advanced} {width} {height} class="pixel-window-background" />
 	{@render children()}
 </div>
 
