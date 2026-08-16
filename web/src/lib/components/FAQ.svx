@@ -1,0 +1,138 @@
+## FAQ
+
+### General
+
+<details>
+<summary>Who can participate?</summary>
+
+BlockChain is for teenagers 13-18 years of age.
+</details>
+
+<details>
+<summary>Is BlockChain legit?</summary>
+
+Yes, BlockChain is a legit program ~~run by~~ (soon to be run by) [Hack Club](https://hackclub.com), a 501(c)(3) nonprofit organization.
+</details>
+
+<details>
+<summary>How can I get help?</summary>
+
+Join the <a href="https://hackclub.com/slack">Hack Club Slack</a> and ask for help in the #block-chain channel.
+</details>
+
+### Projects
+
+<details>
+<summary>What kinda of projects can I make?</summary>
+
+Anything! Most projects either:
+
+- Interact with the game world (e.g., through a turtle)
+- Create new websites or services on the network
+
+Certain projects also have a bounty because their addition benefits the server as a whole.
+</details>
+
+<details>
+<summary>What are project requirements?</summary>
+
+You must track your time using [Hackatime](https://hackatime.hackclub.com/).
+
+Other requirements:
+- A video demo
+- Project must be publicly shared (preferably on GitHub)
+- An organized release (either through BlockChain Scripts, or GitHub Releases) <!-- TODO: Add a link to BlockChain Scripts -->
+- A README explaining how to use the project
+</details>
+
+<details>
+<summary>Can I use AI?</summary>
+
+Yes, AI is allowed. However, we do not permit "AI slop."
+
+If you use AI, you must do so responsibly. Projects with AI use will be held to a higher standard in terms of quality.
+
+"AI slop" will be outright rejected and your hours will not be counted. 
+</details>
+
+<details>
+<summary>What are project requirements?</summary>
+
+You must track your time using [Hackatime](https://hackatime.hackclub.com/).
+
+Other requirements:
+- A video demo
+- Project must be publicly shared (preferably on GitHub)
+- An organized release (either through BlockChain Scripts, or GitHub Releases) <!-- TODO: Add a link to BlockChain Scripts -->
+- A README explaining how to use the project
+</details>
+
+<details>
+<summary>What languages can I use?</summary>
+
+Lua directly runs on ComputerCraft, so it's a great option.
+
+Technically, you could use any language that can be transpiled to Lua.
+
+TypeScript is officially supported. <!-- TODO: Add a link to a guide on TS -->
+</details>
+
+<details>
+<summary>What are bounties?</summary>
+
+Bounties are rewards for completing certain projects. You can see a list of bounties on the project page, and suggest new bounties in Slack.
+
+Once someone claims a bounty, no one else can claim it, so be quick!
+
+<details>
+<summary>Can I charge a service fee?</summary>
+
+*Note: This item is referring to digital, in-game currency, which has no real-world value.*
+
+If the bounty topic provides a service to the public, you are allowed to charge a reasonable fee.
+
+Fees for physical services (e.g., a shipping service) are far more reasonable than digital services (e.g., a search engine).
+
+A search engine should be free both to use and list. You could, however, charge a fee for advertising on your search engine.
+
+Because you are also getting paid for the bounty, we expect that:
+- Fees are kept reasonable and low
+- Fees are not increased sharply or without notice
+- You do not monopolize the service (i.e, you do not prevent other players from creating their own versions of the service)
+- Fees are processed quickly and automatically
+
+Bounty projects are still held to the expectations of a regular project.
+
+</details>
+
+</details>
+
+### Currency
+
+<details>
+<summary>How does currency work?</summary>
+
+BlockChain has two forms of currency:
+
+<ol>
+  <li><img alt="Currency icon" src="/icons/currency.webp" width="20" /> <strong>Currency</strong> - An in-game currency used for trading between players, which has no real-world value.</li>
+  <li><img alt="Token icon" src="/icons/token.webp" width="20" /> <strong>Tokens</strong> - Can be redeemed for real-world rewards! Cannot be traded.</li>
+</ol>
+
+You'll earn both currency and tokens when you submit projects. Bounty projects also earn additional currency (but not tokens).
+</details>
+
+<details>
+<summary>How do I transfer currency?</summary>
+
+See our API docs. <!-- TODO: Add a link -->
+</details>
+
+### Prizes
+
+<details>
+<summary>What prizes can I get?</summary>
+
+See our prizes page. <!-- TODO: Add a link -->
+</details>
+
