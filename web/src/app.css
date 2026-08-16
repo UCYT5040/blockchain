@@ -1,0 +1,30 @@
+@font-face {
+	font-family: 'Mojangles';
+	src: url('/mojangles.woff2') format('woff2');
+	font-weight: normal;
+	font-style: normal;
+}
+
+:root {
+	font-family: 'Mojangles', sans-serif;
+    --background-color: #111111;
+    --border-color: #232323;
+    --basic-border-inner-top-left-color: #595959;
+    --basic-border-inner-bottom-right-color: #fbfbfb;
+    --basic-border-main-color: #c3c3c3;
+    --basic-border-top-left-color: #fbfbfb;
+    --basic-border-bottom-right-color: #595959;
+    --advanced-border-inner-top-left-color: #878847;
+    --advanced-border-inner-bottom-right-color: #dcdb95;
+    --advanced-border-main-color: #c5c66d;
+    --advanced-border-top-left-color: #dbda94;
+    --advanced-border-bottom-right-color: #878847;
+    --advanced-border-corner-color: #000000;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+    background-color: #000000;
+    color: white;
+}
