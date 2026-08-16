@@ -4,7 +4,7 @@ import {
 	getComputersByOwnerSlackID,
 	deleteComputerByID
 } from '$lib/server/airtable';
-import { fail } from '@sveltejs/kit';
+import { fail, error } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { randomBytes } from 'crypto';
 
@@ -28,7 +28,7 @@ async function tryGenerateClientID(): Promise<string> {
 
 export const load: PageServerLoad = async (event) => {
 	if (!event.locals.user || !event.locals.user.slackId) {
-		return fail(401, 'Unauthorized');
+		return error(401, 'Unauthorized');
 	}
 
 	const computers = await getComputersByOwnerSlackID(event.locals.user.slackId);

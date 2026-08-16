@@ -16,3 +16,11 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	return svelteKitHandler({ event, resolve, auth, building });
 };
+import type { HandleServerError } from '@sveltejs/kit';
+
+export const handleError: HandleServerError = ({ error, event }) => {
+	console.error('Unhandled server error at', event.url.pathname, error);
+	return {
+		message: 'Internal error'
+	};
+};
