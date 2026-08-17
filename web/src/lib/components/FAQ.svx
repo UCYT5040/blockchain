@@ -41,7 +41,7 @@ You must track your time using [Hackatime](https://hackatime.hackclub.com/).
 Other requirements:
 - A video demo
 - Project must be publicly shared (preferably on GitHub)
-- An organized release (either through BlockChain Scripts, or GitHub Releases) <!-- TODO: Add a link to BlockChain Scripts -->
+- An organized release (through GitHub Releases) <!-- TODO: Link to a release guide -->
 - A README explaining how to use the project
 </details>
 
