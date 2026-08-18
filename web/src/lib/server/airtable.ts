@@ -125,3 +125,27 @@ export async function getCurrencyByUserSlackID(userSlackId: string) {
 		.all();
 	return results;
 }
+
+interface Currency {
+	transactionId: string;
+	note: string;
+	fromId: string; // Airtable User ID
+	toId: string; // Airtable User ID
+	amount: number;
+	needsAuth: boolean;
+	authorized: boolean;
+	processed: boolean;
+}
+
+export async function createCurrency(currencyData: Currency): Promise<void> {
+	await currency.create({
+		'Transaction ID': currencyData.transactionId,
+		'Note': currencyData.note,
+		'From': [currencyData.fromId],
+		'To': [currencyData.toId],
+		'Amount': currencyData.amount,
+		'Needs Auth': currencyData.needsAuth,
+		'Authorized': currencyData.authorized,
+		'Processed': currencyData.processed
+	});
+}

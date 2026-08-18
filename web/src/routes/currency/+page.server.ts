@@ -16,6 +16,6 @@ export const load: PageServerLoad = async (event) => {
 
 	return {
 		balance: user['Currency'],
-		transactions
+		transactions: transactions.map((transaction) => transaction.fields)
 	};
 };

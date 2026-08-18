@@ -20,24 +20,24 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each data.transactions as transaction (transaction.id)}
-				{@const authStatus = transaction.fields['Needs Auth']
-					? transaction.fields['Processed']
-						? transaction.fields['Authorized']
+			{#each data.transactions as transaction (transaction['Transaction ID'])}
+				{@const authStatus = transaction['Needs Auth']
+					? transaction['Processed']
+						? transaction['Authorized']
 							? 'Authorized'
 							: 'Denied'
-						: transaction.fields['Authorized']
+						: transaction['Authorized']
 							? 'Authorized; Pending'
 							: 'Pending Authorization'
 					: 'Consented'}
 				<tr>
-					<td>{transaction.id}</td>
-					<td>{transaction.fields['Note'] ?? 'No note'}</td>
-					<td>{transaction.fields['Name (from From)'] ?? 'Unknown'}</td>
-					<td>{transaction.fields['Name (from To)'] ?? 'Unknown'}</td>
-					<td>{transaction.fields['Amount'] ?? 'Unknown'}</td>
+					<td>{transaction['Transaction ID']}</td>
+					<td>{transaction['Note'] ?? 'No note'}</td>
+					<td>{transaction['Name (from From)'] ?? 'Unknown'}</td>
+					<td>{transaction['Name (from To)'] ?? 'Unknown'}</td>
+					<td>{transaction['Amount'] ?? 'Unknown'}</td>
 					<td>{authStatus}</td>
-					<td>{transaction.fields['Error'] ?? 'No error'}</td>
+					<td>{transaction['Error'] ?? 'No error'}</td>
 				</tr>
 			{/each}
 		</tbody>
