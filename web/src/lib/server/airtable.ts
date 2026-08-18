@@ -5,7 +5,7 @@ import {
 	AIRTABLE_TABLE_USERS,
 	AIRTABLE_TABLE_CURRENCY
 } from '$env/static/private';
-import Airtable from 'airtable';
+import Airtable, { type FieldSet } from 'airtable';
 
 const airtable = new Airtable({
 	apiKey: AIRTABLE_API_KEY
@@ -48,6 +48,14 @@ export async function getUserBySlackID(slackId: string): Promise<UserAirtableDat
 	};
 }
 
+export async function getUserById(id: string) {
+	const user = await users.find(id);
+	return {
+		...user.fields,
+		id: user.id
+	};
+}
+
 export async function upsertUser(data: UserProfileSync): Promise<void> {
 	const existingUser = await getUserBySlackID(data.slackId);
 
@@ -64,6 +72,12 @@ export async function upsertUser(data: UserProfileSync): Promise<void> {
 	} else {
 		await users.create(airtableData);
 	}
+}
+
+export async function updateUserBalanceById(userId: string, amount: number) {
+	await users.update(userId, {
+		'Currency': amount
+	});
 }
 
 export async function getComputerByClientID(clientId: string) {
@@ -126,7 +140,7 @@ export async function getCurrencyByUserSlackID(userSlackId: string) {
 	return results;
 }
 
-interface Currency {
+export interface Currency {
 	transactionId: string;
 	note: string;
 	fromId: string; // Airtable User ID
@@ -148,4 +162,44 @@ export async function createCurrency(currencyData: Currency): Promise<void> {
 		'Authorized': currencyData.authorized,
 		'Processed': currencyData.processed
 	});
+}
+
+export async function getCurrencyByTransactionId(transactionId: string) {
+	const results = await currency
+		.select({
+			maxRecords: 1,
+			filterByFormula: `{Transaction ID} = "${transactionId}"`
+		})
+		.firstPage();
+	if (results.length === 0) {
+		return null;
+	}
+	return results[0];
+}
+
+export async function upsertCurrencyByTransactionId(currencyData: Currency): Promise<void> {
+	const existingCurrency = await getCurrencyByTransactionId(currencyData.transactionId);
+	if (existingCurrency) {
+		await currency.update(existingCurrency.id, {
+			'Transaction ID': currencyData.transactionId,
+			'Note': currencyData.note,
+			'From': [currencyData.fromId],
+			'To': [currencyData.toId],
+			'Amount': currencyData.amount,
+			'Needs Auth': currencyData.needsAuth,
+			'Authorized': currencyData.authorized,
+			'Processed': currencyData.processed
+		});
+	} else {
+		await createCurrency(currencyData);
+	}
+}
+
+export async function updateCurrencyByTransactionId(transactionId: string, fields: Partial<FieldSet>): Promise<void> {
+	const currencyRecord = await getCurrencyByTransactionId(transactionId);
+	if (!currencyRecord) {
+		throw new Error(`Currency record with transaction ID ${transactionId} not found`);
+	}
+	
+	await currency.update(currencyRecord.id, fields);
 }

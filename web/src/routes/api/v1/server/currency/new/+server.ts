@@ -2,8 +2,8 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { SERVER_TOKEN } from '$env/static/private';
 import { createCurrency, getComputerByClientID } from '$lib/server/airtable';
-
 import { customAlphabet } from 'nanoid';
+import { processCurrency } from '$lib/server/currency';
 
 const alphabet = '0123456789abcdefghijklmnopqrstuvwxyz';
 
@@ -54,7 +54,17 @@ export const POST: RequestHandler = async ({ request }) => {
     const isAuthorized = fromClientId === createdBy;
 
     if (isAuthorized) {
-        // TODO: Send to processing function (which should upsert)
+        const result = await processCurrency({
+            transactionId: generateTransactionId(),
+            note,
+            fromId: fromOwner,
+            toId: toOwner,
+            amount,
+            needsAuth: false,
+            authorized: true,
+            processed: false
+        });
+        return json(result);
     } else {
         await createCurrency({
             transactionId: generateTransactionId(),
