@@ -8,3 +8,4 @@
 - [ ] Connect noobs script to the API and check whether a player is new. Give new players a free computer.
 - [ ] Setup OPAC for claims
 - [ ] Setup server whitelist
+- [ ] Replace demo cache
