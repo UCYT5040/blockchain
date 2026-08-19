@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { SERVER_TOKEN } from '$env/static/private';
 import { getComputerByClientID, getCurrencyByTransactionId } from '$lib/server/airtable';
+import { processCurrency } from '$lib/server/currency';
 
 
 export const POST: RequestHandler = async ({ params, request }) => {
@@ -44,20 +45,23 @@ export const POST: RequestHandler = async ({ params, request }) => {
     }
 
     // TODO: Fix typing
-    if (transaction['Slack ID (from To)'] !== computer.fields["Slack ID (from Owner)"]) {
+    const txSlackIdTo = (transaction.fields['Slack ID (from To)'] as string[])?.[0];
+    const computerSlackId = (computer.fields['Slack ID (from Owner)'] as string[])?.[0];
+
+    if (txSlackIdTo !== computerSlackId) {
         return json({ error: 'Computer does not belong to the receiving user' }, { status: 403 });
     }
 
     // Process the transaction
     const result = await processCurrency({
-        transactionId: transaction['Transaction ID'],
-        note: transaction['Note'],
-        fromId: transaction['From'],
-        toId: transaction['To'],
-        amount: transaction['Amount'],
-        needsAuth: transaction['Needs Auth'],
-        authorized: transaction['Authorized'],
-        processed: transaction['Processed']
+        transactionId: transaction.fields['Transaction ID'] as string,
+        note: transaction.fields['Note'] as string,
+        fromId: (transaction.fields['From'] as string[])[0],
+        toId: (transaction.fields['To'] as string[])[0],
+        amount: transaction.fields['Amount'] as number,
+        needsAuth: transaction.fields['Needs Auth'] as boolean,
+        authorized: transaction.fields['Authorized'] as boolean,
+        processed: transaction.fields['Processed'] as boolean
     });
     
     return json(result);

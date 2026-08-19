@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { SERVER_TOKEN } from '$env/static/private';
-import { createCurrency, getComputerByClientID, getCurrencyByTransactionId } from '$lib/server/airtable';
+import { getComputerByClientID, getCurrencyByTransactionId, updateCurrencyByTransactionId } from '$lib/server/airtable';
 
 
 export const POST: RequestHandler = async ({ params, request }) => {
@@ -26,15 +26,15 @@ export const POST: RequestHandler = async ({ params, request }) => {
 
     // TODO: Fix typing
 
-    if (!transaction['Needs Auth']) {
+    if (!transaction.fields['Needs Auth']) {
         return json({ error: 'Transaction does not need authentication' }, { status: 400 });
     }
 
-    if (transaction['Processed']) {
+    if (transaction.fields['Processed']) {
         return json({ error: 'Transaction has already been processed' }, { status: 400 });
     }
 
-    if (transaction['Authorized']) {
+    if (transaction.fields['Authorized']) {
         return json({ error: 'Transaction has already been authorized' }, { status: 400 });
     }
 
@@ -45,11 +45,17 @@ export const POST: RequestHandler = async ({ params, request }) => {
         return json({ error: 'Computer not found' }, { status: 404 });
     }
 
-    if (transaction['Slack ID (from From)'] !== computer.fields["Slack ID (from Owner)"]) {
+    const txSlackIdFrom = (transaction.fields['Slack ID (from From)'] as string[])?.[0];
+    const computerSlackId = (computer.fields['Slack ID (from Owner)'] as string[])?.[0];
+
+    if (txSlackIdFrom !== computerSlackId) {
         return json({ error: 'Computer does not belong to the from user' }, { status: 403 });
     }
 
     // Update currency
+    await updateCurrencyByTransactionId(transactionId, {
+        'Authorized': true
+    });
 
     return json({ success: true });
 };
