@@ -44,24 +44,23 @@ export const POST: RequestHandler = async ({ params, request }) => {
         return json({ error: 'Computer not found' }, { status: 404 });
     }
 
-    // TODO: Fix typing
-    const txSlackIdTo = (transaction.fields['Slack ID (from To)'] as string[])?.[0];
-    const computerSlackId = (computer.fields['Slack ID (from Owner)'] as string[])?.[0];
+    const txSlackIdTo = transaction.fields['Slack ID (from To)']?.[0];
+    const computerSlackId = computer.fields['Slack ID (from Owner)']?.[0];
 
-    if (txSlackIdTo !== computerSlackId) {
+    if (!txSlackIdTo || txSlackIdTo !== computerSlackId) {
         return json({ error: 'Computer does not belong to the receiving user' }, { status: 403 });
     }
 
     // Process the transaction
     const result = await processCurrency({
-        transactionId: transaction.fields['Transaction ID'] as string,
-        note: transaction.fields['Note'] as string,
-        fromId: (transaction.fields['From'] as string[])[0],
-        toId: (transaction.fields['To'] as string[])[0],
-        amount: transaction.fields['Amount'] as number,
-        needsAuth: transaction.fields['Needs Auth'] as boolean,
-        authorized: transaction.fields['Authorized'] as boolean,
-        processed: transaction.fields['Processed'] as boolean
+        transactionId: transaction.fields['Transaction ID'],
+        note: transaction.fields.Note ?? '',
+        fromId: transaction.fields.From[0],
+        toId: transaction.fields.To[0],
+        amount: transaction.fields.Amount,
+        needsAuth: transaction.fields['Needs Auth'] ?? false,
+        authorized: transaction.fields.Authorized ?? false,
+        processed: transaction.fields.Processed ?? false
     });
     
     return json(result);

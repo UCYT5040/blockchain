@@ -24,8 +24,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
         return json({ error: 'Transaction not found' }, { status: 404 });
     }
 
-    // TODO: Fix typing
-
+    // Validate transaction state
     if (!transaction.fields['Needs Auth']) {
         return json({ error: 'Transaction does not need authentication' }, { status: 400 });
     }
@@ -45,16 +44,16 @@ export const POST: RequestHandler = async ({ params, request }) => {
         return json({ error: 'Computer not found' }, { status: 404 });
     }
 
-    const txSlackIdFrom = (transaction.fields['Slack ID (from From)'] as string[])?.[0];
-    const computerSlackId = (computer.fields['Slack ID (from Owner)'] as string[])?.[0];
+    const txSlackIdFrom = transaction.fields['Slack ID (from From)']?.[0];
+    const computerSlackId = computer.fields['Slack ID (from Owner)']?.[0];
 
-    if (txSlackIdFrom !== computerSlackId) {
+    if (!txSlackIdFrom || txSlackIdFrom !== computerSlackId) {
         return json({ error: 'Computer does not belong to the from user' }, { status: 403 });
     }
 
     // Update currency
     await updateCurrencyByTransactionId(transactionId, {
-        'Authorized': true
+        Authorized: true
     });
 
     return json({ success: true });

@@ -18,15 +18,15 @@ export const GET: RequestHandler = async ({ params, request }) => {
         return json({ error: 'Computer not found' }, { status: 404 });
     }
 
-    const user = await getUserById((computer.fields.Owner as string[])[0]);
+    const user = await getUserById(computer.fields.Owner[0]);
     if (!user) {
         return json({ error: 'User not found' }, { status: 404 });
     }
 
     // List transactions
-    const transactions = await getCurrencyByUserSlackID(user["Slack ID"]);
+    const transactions = user['Slack ID'] ? await getCurrencyByUserSlackID(user['Slack ID']) : [];
     return json({
-        balance: user["Currency"],
+        balance: user.Currency ?? 0,
         transactions: transactions.map((transaction) => transaction.fields)
     });
 };

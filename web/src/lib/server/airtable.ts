@@ -5,7 +5,7 @@ import {
 	AIRTABLE_TABLE_USERS,
 	AIRTABLE_TABLE_CURRENCY
 } from '$env/static/private';
-import Airtable, { type FieldSet } from 'airtable';
+import Airtable, { type FieldSet, type Record as AirtableRecord, type Records } from 'airtable';
 
 const airtable = new Airtable({
 	apiKey: AIRTABLE_API_KEY
@@ -13,11 +13,46 @@ const airtable = new Airtable({
 
 const base = airtable.base(AIRTABLE_BASE);
 
-export const users = base.table(AIRTABLE_TABLE_USERS);
+export interface UserFields extends FieldSet {
+	'Slack ID'?: string;
+	Email?: string;
+	Name?: string;
+	'Verification Status'?: string;
+	'YSWS Eligible'?: boolean;
+	Currency?: number;
+}
 
-export const computers = base.table(AIRTABLE_TABLE_COMPUTERS);
+export interface ComputerFields extends FieldSet {
+	'Client ID': string;
+	'Master Key': string;
+	Owner: string[];
+	'Slack ID (from Owner)'?: string[];
+}
 
-export const currency = base.table(AIRTABLE_TABLE_CURRENCY);
+export interface CurrencyRecordFields extends FieldSet {
+	'Transaction ID': string;
+	Note?: string;
+	From: string[];
+	To: string[];
+	Amount: number;
+	'Needs Auth'?: boolean;
+	Authorized?: boolean;
+	Processed?: boolean;
+	'Slack ID (from From)'?: string[];
+	'Slack ID (from To)'?: string[];
+}
+
+export type UserRecord = AirtableRecord<UserFields>;
+export type ComputerRecord = AirtableRecord<ComputerFields>;
+export type CurrencyRecord = AirtableRecord<CurrencyRecordFields>;
+
+export interface UserData extends UserFields {
+	id: string;
+}
+
+export const users = base.table<UserFields>(AIRTABLE_TABLE_USERS);
+export const computers = base.table<ComputerFields>(AIRTABLE_TABLE_COMPUTERS);
+export const currency = base.table<CurrencyRecordFields>(AIRTABLE_TABLE_CURRENCY);
 
 interface UserProfileSync {
 	slackId: string;
@@ -27,12 +62,7 @@ interface UserProfileSync {
 	name: string;
 }
 
-interface UserAirtableData {
-	id: string;
-	[key: string]: unknown;
-}
-
-export async function getUserBySlackID(slackId: string): Promise<UserAirtableData | null> {
+export async function getUserBySlackID(slackId: string): Promise<UserData | null> {
 	const existingUsers = await users
 		.select({
 			maxRecords: 1,
@@ -48,12 +78,16 @@ export async function getUserBySlackID(slackId: string): Promise<UserAirtableDat
 	};
 }
 
-export async function getUserById(id: string) {
-	const user = await users.find(id);
-	return {
-		...user.fields,
-		id: user.id
-	};
+export async function getUserById(id: string): Promise<UserData | null> {
+	try {
+		const user = await users.find(id);
+		return {
+			...user.fields,
+			id: user.id
+		};
+	} catch {
+		return null;
+	}
 }
 
 export async function upsertUser(data: UserProfileSync): Promise<void> {
@@ -74,13 +108,13 @@ export async function upsertUser(data: UserProfileSync): Promise<void> {
 	}
 }
 
-export async function updateUserBalanceById(userId: string, amount: number) {
+export async function updateUserBalanceById(userId: string, amount: number): Promise<void> {
 	await users.update(userId, {
-		'Currency': amount
+		Currency: amount
 	});
 }
 
-export async function getComputerByClientID(clientId: string) {
+export async function getComputerByClientID(clientId: string): Promise<ComputerRecord | null> {
 	const computerResults = await computers
 		.select({
 			maxRecords: 1,
@@ -115,7 +149,9 @@ export async function addComputer(
 	});
 }
 
-export async function getComputersByOwnerSlackID(ownerSlackId: string) {
+export async function getComputersByOwnerSlackID(
+	ownerSlackId: string
+): Promise<Records<ComputerFields>> {
 	const computerResults = await computers
 		.select({
 			filterByFormula: `{Slack ID (from Owner)} = "${ownerSlackId}"`
@@ -131,7 +167,9 @@ export async function deleteComputerByID(id: string): Promise<void> {
 	await computers.destroy(id);
 }
 
-export async function getCurrencyByUserSlackID(userSlackId: string) {
+export async function getCurrencyByUserSlackID(
+	userSlackId: string
+): Promise<Records<CurrencyRecordFields>> {
 	const results = await currency
 		.select({
 			filterByFormula: `OR({Slack ID (from From)} = "${userSlackId}", {Slack ID (from To)} = "${userSlackId}")`
@@ -154,17 +192,17 @@ export interface Currency {
 export async function createCurrency(currencyData: Currency): Promise<void> {
 	await currency.create({
 		'Transaction ID': currencyData.transactionId,
-		'Note': currencyData.note,
-		'From': [currencyData.fromId],
-		'To': [currencyData.toId],
-		'Amount': currencyData.amount,
+		Note: currencyData.note,
+		From: [currencyData.fromId],
+		To: [currencyData.toId],
+		Amount: currencyData.amount,
 		'Needs Auth': currencyData.needsAuth,
-		'Authorized': currencyData.authorized,
-		'Processed': currencyData.processed
+		Authorized: currencyData.authorized,
+		Processed: currencyData.processed
 	});
 }
 
-export async function getCurrencyByTransactionId(transactionId: string) {
+export async function getCurrencyByTransactionId(transactionId: string): Promise<CurrencyRecord | null> {
 	const results = await currency
 		.select({
 			maxRecords: 1,
@@ -182,24 +220,27 @@ export async function upsertCurrencyByTransactionId(currencyData: Currency): Pro
 	if (existingCurrency) {
 		await currency.update(existingCurrency.id, {
 			'Transaction ID': currencyData.transactionId,
-			'Note': currencyData.note,
-			'From': [currencyData.fromId],
-			'To': [currencyData.toId],
-			'Amount': currencyData.amount,
+			Note: currencyData.note,
+			From: [currencyData.fromId],
+			To: [currencyData.toId],
+			Amount: currencyData.amount,
 			'Needs Auth': currencyData.needsAuth,
-			'Authorized': currencyData.authorized,
-			'Processed': currencyData.processed
+			Authorized: currencyData.authorized,
+			Processed: currencyData.processed
 		});
 	} else {
 		await createCurrency(currencyData);
 	}
 }
 
-export async function updateCurrencyByTransactionId(transactionId: string, fields: Partial<FieldSet>): Promise<void> {
+export async function updateCurrencyByTransactionId(
+	transactionId: string,
+	fields: Partial<CurrencyRecordFields>
+): Promise<void> {
 	const currencyRecord = await getCurrencyByTransactionId(transactionId);
 	if (!currencyRecord) {
 		throw new Error(`Currency record with transaction ID ${transactionId} not found`);
 	}
-	
+
 	await currency.update(currencyRecord.id, fields);
 }

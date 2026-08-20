@@ -42,8 +42,8 @@ export const POST: RequestHandler = async ({ request }) => {
 
     // These are Airtable user IDs (not Slack IDs)
     // TODO: Should we be getting the first item from a list here?
-    const fromOwner = (fromComputer.fields["Owner"] as string[])[0];
-    const toOwner = (toComputer.fields["Owner"] as string[])[0];
+    const fromOwner = fromComputer.fields.Owner[0];
+    const toOwner = toComputer.fields.Owner[0];
 
     // Ensure computers belong to different owners
     if (fromOwner === toOwner) {

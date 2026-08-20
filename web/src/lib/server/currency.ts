@@ -31,8 +31,8 @@ export async function processCurrency(currency: Currency): Promise<ProcessCurren
 		return { success: false, error: 'From user not found' };
 	}
 
-	// TODO: Fix typing
-	if (fromUser['Currency'] < currency.amount) {
+	const fromBalance = fromUser.Currency ?? 0;
+	if (fromBalance < currency.amount) {
 		return { success: false, error: 'From user does not have enough currency' };
 	}
 
@@ -40,11 +40,11 @@ export async function processCurrency(currency: Currency): Promise<ProcessCurren
 	if (!toUser) {
 		return { success: false, error: 'To user not found' };
 	}
+	const toBalance = toUser.Currency ?? 0;
 
 	// Perform the transaction
-	// TODO: Fix typing
-	await updateUserBalanceById(currency.fromId, fromUser['Currency'] - currency.amount);
-	await updateUserBalanceById(currency.toId, toUser['Currency'] + currency.amount);
+	await updateUserBalanceById(currency.fromId, fromBalance - currency.amount);
+	await updateUserBalanceById(currency.toId, toBalance + currency.amount);
 
 	// Upsert currency
 	await upsertCurrencyByTransactionId({

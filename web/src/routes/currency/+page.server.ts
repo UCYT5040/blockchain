@@ -15,7 +15,7 @@ export const load: PageServerLoad = async (event) => {
 	const transactions = await getCurrencyByUserSlackID(event.locals.user.slackId);
 
 	return {
-		balance: user['Currency'],
+		balance: user.Currency ?? 0,
 		transactions: transactions.map((transaction) => transaction.fields)
 	};
 };
