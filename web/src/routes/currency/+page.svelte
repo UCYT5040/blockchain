@@ -16,7 +16,6 @@
 				<th>To</th>
 				<th>Amount</th>
 				<th>Authorization</th>
-				<th>Error</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -37,7 +36,6 @@
 					<td>{transaction['Name (from To)'] ?? 'Unknown'}</td>
 					<td>{transaction['Amount'] ?? 'Unknown'}</td>
 					<td>{authStatus}</td>
-					<td>{transaction['Error'] ?? 'No error'}</td>
 				</tr>
 			{/each}
 		</tbody>
