@@ -1,18 +1,17 @@
-import {
-	getUserById,
-	updateUserBalanceById,
-	upsertCurrencyByTransactionId,
-	type Currency
-} from './airtable';
-
-export type ProcessCurrencyResult =
-	| {
-			success: true;
-	  }
-	| {
-			success: false;
-			error: string;
-	  };
+import { getUserById, updateUserBalanceById, upsertCurrencyByTransactionId } from './airtable';
+export type {
+	Currency,
+	CurrencyRecordFields,
+	CurrencyListResponse,
+	NewCurrencyRequest,
+	AuthorizeCurrencyRequest,
+	ProcessCurrencyRequest,
+	ProcessCurrencyResult,
+	CurrencySuccessResponse,
+	CurrencyErrorResponse,
+	CurrencyActionResult
+} from '../../../../common/currency';
+import type { Currency, ProcessCurrencyResult } from '../../../../common/currency';
 
 export async function processCurrency(currency: Currency): Promise<ProcessCurrencyResult> {
 	// Require authentication

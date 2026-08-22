@@ -15,6 +15,7 @@ import {
 } from 'protocol';
 import { MOTDCache, ServerKeyCache } from './cache';
 import { encryptText, blake2s, generateRandomHex } from 'crypto';
+import { listCurrency } from './currency';
 
 term.redirect(peripheral.wrap('left') as MonitorPeripheral);
 
@@ -117,6 +118,15 @@ function handleIncomingRequest(packet: WirePacket) {
 				errorMsg = 'Failed to get MOTD';
 			} else {
 				responseData = { motd };
+			}
+			break;
+		case 'currency:list':
+			const currencyList = listCurrency(clientId);
+			if (!currencyList) {
+				success = false;
+				errorMsg = 'Failed to get currency list';
+			} else {
+				responseData = { currencyList };
 			}
 			break;
 		default:

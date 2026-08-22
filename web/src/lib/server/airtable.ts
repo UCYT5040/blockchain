@@ -13,6 +13,9 @@ const airtable = new Airtable({
 
 const base = airtable.base(AIRTABLE_BASE);
 
+import type { Currency, CurrencyRecordFields } from '../../../../common/currency';
+export type { Currency, CurrencyRecordFields };
+
 export interface UserFields extends FieldSet {
 	'Slack ID'?: string;
 	Email?: string;
@@ -27,19 +30,6 @@ export interface ComputerFields extends FieldSet {
 	'Master Key': string;
 	Owner: string[];
 	'Slack ID (from Owner)'?: string[];
-}
-
-export interface CurrencyRecordFields extends FieldSet {
-	'Transaction ID': string;
-	Note?: string;
-	From: string[];
-	To: string[];
-	Amount: number;
-	'Needs Auth'?: boolean;
-	Authorized?: boolean;
-	Processed?: boolean;
-	'Slack ID (from From)'?: string[];
-	'Slack ID (from To)'?: string[];
 }
 
 export type UserRecord = AirtableRecord<UserFields>;
@@ -178,17 +168,6 @@ export async function getCurrencyByUserSlackID(
 	return results;
 }
 
-export interface Currency {
-	transactionId: string;
-	note: string;
-	fromId: string; // Airtable User ID
-	toId: string; // Airtable User ID
-	amount: number;
-	needsAuth: boolean;
-	authorized: boolean;
-	processed: boolean;
-}
-
 export async function createCurrency(currencyData: Currency): Promise<void> {
 	await currency.create({
 		'Transaction ID': currencyData.transactionId,
@@ -202,7 +181,9 @@ export async function createCurrency(currencyData: Currency): Promise<void> {
 	});
 }
 
-export async function getCurrencyByTransactionId(transactionId: string): Promise<CurrencyRecord | null> {
+export async function getCurrencyByTransactionId(
+	transactionId: string
+): Promise<CurrencyRecord | null> {
 	const results = await currency
 		.select({
 			maxRecords: 1,
