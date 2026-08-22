@@ -1,9 +1,9 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { SERVER_TOKEN } from '$env/static/private';
-import { demoMasterKeyCache } from '$lib/demoCache';
+import { getComputerByClientID } from '$lib/server/airtable';
 
-export const GET: RequestHandler = ({ params, request }) => {
+export const GET: RequestHandler = async ({ params, request }) => {
 	const clientId = params.clientId;
 
 	// Ensure valid token
@@ -12,13 +12,18 @@ export const GET: RequestHandler = ({ params, request }) => {
 		return json({ error: 'Invalid token' }, { status: 401 });
 	}
 
-	// Check cache for key
-	const key = demoMasterKeyCache[clientId];
+	// Fetch computer from Airtable
+	const computer = await getComputerByClientID(clientId);
+	if (!computer) {
+		return json({ error: 'Computer not found' }, { status: 404 });
+	}
 
-	if (!key) {
-		return json({ error: 'Not found' }, { status: 404 });
+	const masterKey = computer.fields['Master Key'];
+	if (!masterKey) {
+		return json({ error: 'Master key not found' }, { status: 404 });
 	}
 
 	// Return key
-	return json({ masterKey: key });
+	return json({ masterKey });
 };
+
