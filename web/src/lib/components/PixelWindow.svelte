@@ -12,25 +12,30 @@
 
 	let { class: className, advanced = false, children, ...otherProps }: Props = $props();
 
-    let divElement: HTMLDivElement | null = $state(null);
+	let divElement: HTMLDivElement | null = $state(null);
 
-    let width: number | undefined = $state(undefined);
-    let height: number | undefined = $state(undefined);
+	let width: number | undefined = $state(undefined);
+	let height: number | undefined = $state(undefined);
 
-    function updateSize() {
-        if (!divElement) {
-            return;
-        }
-        const { width: newWidth, height: newHeight } = divElement.getBoundingClientRect();
-        width = newWidth;
-        height = newHeight;
-    }
+	function updateSize() {
+		if (!divElement) {
+			return;
+		}
+		const { width: newWidth, height: newHeight } = divElement.getBoundingClientRect();
+		width = newWidth;
+		height = newHeight;
+	}
 
-    onMount(updateSize)
+	onMount(updateSize);
 </script>
 
-<div {...otherProps} class={`pixel-window ${className ?? ''}`} bind:this={divElement} onresize={updateSize}>
-    <PixelBackground {advanced} {width} {height} class="pixel-window-background" />
+<div
+	{...otherProps}
+	class={`pixel-window ${className ?? ''}`}
+	bind:this={divElement}
+	onresize={updateSize}
+>
+	<PixelBackground {advanced} {width} {height} class="pixel-window-background" />
 	{@render children()}
 </div>
 
@@ -39,14 +44,14 @@
 		/* Allow the background to be absolutely positioned within the window */
 		position: relative;
 		isolation: isolate;
-        /* Padding based on the background's border (24px) + a little extra */
-        padding: calc(24px + 1em);
+		/* Padding based on the background's border (24px) + a little extra */
+		padding: calc(24px + 1em);
 	}
 
-    :global(.pixel-window-background) {
-        position: absolute;
-        inset: 0;
-        z-index: -1;
-        pointer-events: none;
-    }
+	:global(.pixel-window-background) {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		pointer-events: none;
+	}
 </style>

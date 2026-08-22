@@ -17,14 +17,14 @@ export function get(path: string) {
 }
 
 export function post(path: string, body: string, mimeType?: string) {
-    headers['Content-Type'] = mimeType || 'text/plain';
+	headers['Content-Type'] = mimeType || 'text/plain';
 
 	const [res, reason] = http.post(`${SERVER_URL}/${path}`, body, headers);
-	
-    // Remove Content-Type header
-    headers.delete('Content-Type');
-    
-    if (!res) {
+
+	// Remove Content-Type header
+	headers.delete('Content-Type');
+
+	if (!res) {
 		print(`[HTTP] POST failed: ${reason}`);
 		return null;
 	}
