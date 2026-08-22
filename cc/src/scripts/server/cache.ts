@@ -1,5 +1,6 @@
 import { BlitData } from '@common/prettyText';
 import { SERVER_URL } from '@shared/const';
+import { get } from './http';
 
 interface CachedKey {
 	masterKey: string;
@@ -32,16 +33,11 @@ export class ServerKeyCache {
 			}
 		}
 
-		const headers = new LuaMap<string, string>();
-		headers['Authorization'] = `Bearer ${this.serverToken}`;
-
-		const [res, reason] = http.get(`${SERVER_URL}/server/key/${clientId}`, headers);
-		if (!res) {
-			print(`[ServerKeyCache] http.get failed for ${clientId}: ${reason}`);
+		const raw = get(`server/key/${clientId}`);
+		if (!raw) {
+			print('[ServerKeyCache] Failed to get key');
 			return null;
 		}
-		const raw = res.readAll() as string;
-		res.close();
 
 		let keyData: { masterKey?: string } | undefined;
 		try {
