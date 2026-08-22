@@ -15,7 +15,7 @@ import {
 } from 'protocol';
 import { MOTDCache, ServerKeyCache } from './cache';
 import { encryptText, blake2s, generateRandomHex } from 'crypto';
-import { listCurrency } from './currency';
+import { listCurrency, newCurrency, authorizeCurrency, processCurrency } from './currency';
 
 term.redirect(peripheral.wrap('left') as MonitorPeripheral);
 
@@ -126,7 +126,73 @@ function handleIncomingRequest(packet: WirePacket) {
 				success = false;
 				errorMsg = 'Failed to get currency list';
 			} else {
-				responseData = { currencyList };
+				responseData = currencyList;
+			}
+			break;
+		case 'currency:new':
+			const toClientId = req.params.toClientId as string;
+			const amount = Number(req.params.amount);
+			const note = (req.params.note as string) || '';
+			const fromClientId = (req.params.fromClientId as string) || clientId;
+
+			if (!toClientId) {
+				success = false;
+				errorMsg = 'Missing recipient computer ID (toClientId)';
+				break;
+			}
+			if (isNaN(amount) || amount <= 0) {
+				success = false;
+				errorMsg = 'Invalid transaction amount';
+				break;
+			}
+
+			const newResult = newCurrency(fromClientId, toClientId, amount, clientId, note);
+			if (!newResult) {
+				success = false;
+				errorMsg = 'Failed to create currency transaction';
+			} else if ('error' in newResult && newResult.error) {
+				success = false;
+				errorMsg = newResult.error;
+			} else {
+				responseData = newResult;
+			}
+			break;
+		case 'currency:authorize':
+			const authTxId = req.params.transactionId as string;
+			if (!authTxId) {
+				success = false;
+				errorMsg = 'Missing transaction ID (transactionId)';
+				break;
+			}
+
+			const authResult = authorizeCurrency(authTxId, clientId);
+			if (!authResult) {
+				success = false;
+				errorMsg = 'Failed to authorize transaction';
+			} else if ('error' in authResult && authResult.error) {
+				success = false;
+				errorMsg = authResult.error;
+			} else {
+				responseData = authResult;
+			}
+			break;
+		case 'currency:process':
+			const procTxId = req.params.transactionId as string;
+			if (!procTxId) {
+				success = false;
+				errorMsg = 'Missing transaction ID (transactionId)';
+				break;
+			}
+
+			const procResult = processCurrency(procTxId, clientId);
+			if (!procResult) {
+				success = false;
+				errorMsg = 'Failed to process transaction';
+			} else if ('error' in procResult && procResult.error) {
+				success = false;
+				errorMsg = procResult.error;
+			} else {
+				responseData = procResult;
 			}
 			break;
 		default:

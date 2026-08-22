@@ -12,6 +12,7 @@ import {
 } from 'protocol';
 import { SessionManager } from './session';
 import { decryptText } from 'crypto';
+import type { CurrencyListResponse, CurrencyActionResult } from '@common/currency';
 
 export class ClientAPI {
 	private network: NetworkAdapter;
@@ -252,5 +253,71 @@ export class ClientAPI {
 
 		const packet = this.protocol.createDataPacket(peerId, payload, sessionKey);
 		this.network.sendPacket(packet);
+	}
+
+	/**
+	 * Retrieves the balance and transaction list for this client from the server.
+	 */
+	public async listCurrency(): Promise<CurrencyListResponse> {
+		return (await this.request('currency:list')) as CurrencyListResponse;
+	}
+
+	/**
+	 * Retrieves the current currency balance for this client.
+	 */
+	public async getBalance(): Promise<number> {
+		const res = await this.listCurrency();
+		return res?.balance ?? 0;
+	}
+
+	/**
+	 * Sends currency from this computer to a recipient computer.
+	 */
+	public async transfer(
+		toClientId: string,
+		amount: number,
+		note = ''
+	): Promise<CurrencyActionResult> {
+		return (await this.request('currency:new', {
+			toClientId,
+			amount,
+			note,
+			fromClientId: this.clientId
+		})) as CurrencyActionResult;
+	}
+
+	/**
+	 * Creates a currency transaction (direct transfer or payment request from another computer).
+	 */
+	public async createTransaction(
+		toClientId: string,
+		amount: number,
+		note = '',
+		fromClientId?: string
+	): Promise<CurrencyActionResult> {
+		return (await this.request('currency:new', {
+			toClientId,
+			amount,
+			note,
+			fromClientId: fromClientId || this.clientId
+		})) as CurrencyActionResult;
+	}
+
+	/**
+	 * Authorizes a pending currency transaction where this client is the sender/payer.
+	 */
+	public async authorizeTransaction(transactionId: string): Promise<CurrencyActionResult> {
+		return (await this.request('currency:authorize', {
+			transactionId
+		})) as CurrencyActionResult;
+	}
+
+	/**
+	 * Processes an authorized currency transaction where this client is the recipient.
+	 */
+	public async processTransaction(transactionId: string): Promise<CurrencyActionResult> {
+		return (await this.request('currency:process', {
+			transactionId
+		})) as CurrencyActionResult;
 	}
 }
