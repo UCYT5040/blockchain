@@ -1,6 +1,7 @@
 <script>
 	import { resolve } from '$app/paths';
 	import PixelWindow from '$lib/components/PixelWindow.svelte';
+	import FAQ from '$lib/components/FAQ.svx';
 </script>
 
 <header>
@@ -8,6 +9,7 @@
 	<nav>
 		<a href="#faq">FAQ</a>
 		<a href={resolve('/auth')}>Get started</a>
+		<a href={resolve('/docs')}>Docs</a>
 	</nav>
 </header>
 
@@ -39,6 +41,10 @@
 			<h3>Step 3</h3>
 			<p>Get prizes</p>
 		</PixelWindow>
+	</section>
+	<section id="faq">
+		<h2>FAQ</h2>
+		<FAQ />
 	</section>
 </main>
 
@@ -75,5 +81,9 @@
 
 	:global(.step) {
         width: 80%;
+	}
+
+	#faq {
+		margin-left: 10%;
 	}
 </style>
