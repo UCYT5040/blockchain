@@ -53,7 +53,7 @@ summary {
 	margin-left: -1.5em;
 }
 
-summary:hover, details[open] summary {
+summary:hover, details[open]>summary {
     color: #4c99b2;
 }
  
