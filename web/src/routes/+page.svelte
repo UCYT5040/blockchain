@@ -12,9 +12,9 @@
 </header>
 
 <main>
-	<section>
+	<section id="how-it-works">
 		<h2>How it works</h2>
-		<PixelWindow>
+		<PixelWindow class="step">
 			<h3>Step 1</h3>
 			<p>Create cool programs</p>
 			<figure>
@@ -29,11 +29,13 @@
 				<figcaption>A monitor displaying how full a connected chest is</figcaption>
 			</figure>
 		</PixelWindow>
-		<PixelWindow>
+		<PixelWindow class="step">
 			<h3>Step 2</h3>
 			<p>Track your time</p>
+			<p>Use your regular code editor with Hackatime.</p>
+			<p>Drag and drop your programs into Minecraft to run them!</p>
 		</PixelWindow>
-		<PixelWindow>
+		<PixelWindow class="step">
 			<h3>Step 3</h3>
 			<p>Get prizes</p>
 		</PixelWindow>
@@ -61,5 +63,17 @@
 		display: flex;
 		justify-content: center;
 		gap: 4em;
+	}
+
+	#how-it-works {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 4em;
+		width: 100%;
+	}
+
+	:global(.step) {
+        width: 80%;
 	}
 </style>
