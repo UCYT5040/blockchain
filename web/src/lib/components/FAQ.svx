@@ -127,7 +127,9 @@ You'll earn both currency and tokens when you submit projects. Bounty projects a
 <details>
 <summary>How do I transfer currency?</summary>
 
-See our API docs. <!-- TODO: Add a link -->
+Only in-game currency can be transferred. Tokens can not be transferred.
+
+See the [currency methods](/docs/client#gear-createtransaction).
 </details>
 
 ### Prizes

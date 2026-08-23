@@ -12,6 +12,28 @@ All computers on the server come pre-equipped with three APIs:
 - [`crypto`](/docs/crypto): Basic crypto functions.
 - [`protocol`](/docs/protocol): Low-level networking functions.
 
+These are TypeScript docs, make the applicable conversions when writing in Lua (e.g., `null` -> `nil`).
+
+## ComputerCraft Docs
+
+All the base CC: Tweaked documentation can be found [here](https://tweaked.cc/).
+
+Note: The Ender Modem is [nerfed](https://peripherals.proto.land/tweaks/#ender-modem-nerf) by [Classic Peripherals](#classic-peripherals).
+
+### Advanced Peripherals
+
+See the docs [here](https://docs.advanced-peripherals.de/latest/).
+
+Note: The [mod integrations](https://docs.advanced-peripherals.de/latest/integrations/) (except Minecraft) do not apply and the [Chat Box](https://docs.advanced-peripherals.de/latest/peripherals/chat_box/) and [Chatty Turtle](https://docs.advanced-peripherals.de/latest/turtles/chatty_turtle/) have been disabled.
+
+### Classic Peripherals
+
+See the docs [here](https://peripherals.proto.land/).
+
+### Ducky Peripherals
+
+See the docs [here](https://github.com/SamsTheNerd/ducky-periphs/wiki).
+
 ## FAQ
 
 <FAQ />
