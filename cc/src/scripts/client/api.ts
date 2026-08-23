@@ -14,6 +14,24 @@ import { SessionManager } from './session';
 import { decryptText } from 'crypto';
 import type { CurrencyListResponse, CurrencyActionResult } from '@common/currency';
 
+export { SessionEntry, SessionManager } from './session';
+export {
+	StoredClientConfig,
+	RuntimeClientConfig,
+	loadConfig,
+	saveConfig,
+	getRuntimeConfig,
+	saveRuntimeConfig
+} from './config';
+export {
+	ChatMessage,
+	ChatStore,
+	globalChatStore,
+	initChatListener,
+	openChatMenu,
+	openChatThread
+} from './chat';
+
 export class ClientAPI {
 	private network: NetworkAdapter;
 	private protocol: ProtocolEngine;
@@ -30,6 +48,11 @@ export class ClientAPI {
 	) => Promise<unknown> | unknown;
 	private p2pMessageHandler?: (this: void, src: string, payload: DirectMessagePayload) => void;
 
+	/** Creates a new ClientAPI instance
+	 * @param clientId The client ID
+	 * @param masterKey The master key
+	 * @param serverId The server ID (default: 'SERVER')
+	*/
 	constructor(clientId: string, masterKey: string, serverId = 'SERVER') {
 		this.network = new NetworkAdapter(100);
 		this.protocol = new ProtocolEngine(clientId);
@@ -42,7 +65,9 @@ export class ClientAPI {
 		return this.sessionManager;
 	}
 
-	/** Registers a handler function for incoming P2P RPC requests from peers */
+	/** Registers a handler function for incoming P2P RPC requests from peers
+	 * @param handler The handler function to register
+	*/
 	public onP2PRequest(
 		handler: (
 			this: void,
@@ -54,7 +79,9 @@ export class ClientAPI {
 		this.p2pRequestHandler = handler;
 	}
 
-	/** Registers a handler function for incoming direct P2P data messages */
+	/** Registers a handler function for incoming direct P2P data messages
+	 * @param handler The handler function to register
+	*/
 	public onP2PMessage(
 		handler: (this: void, src: string, payload: DirectMessagePayload) => void
 	): void {
@@ -86,7 +113,7 @@ export class ClientAPI {
 
 	/**
 	 * Continuously listens for incoming network packets and dispatches responses / P2P handlers.
-	 * Runs in parallel with client operations using parallel.waitForAny / waitForAll.
+	 * Consider running in parallel using parallel.waitForAny / waitForAll.
 	 */
 	public listen(): void {
 		while (true) {

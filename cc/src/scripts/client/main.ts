@@ -7,6 +7,8 @@ import { displayMOTD } from '@shared/motd';
 import { BlitData } from '@common/prettyText';
 import { initChatListener, openChatMenu } from './chat';
 
+export * from './api';
+
 const REGISTRATION_SITE = ''; // TODO: Add registration site
 
 write(
@@ -51,7 +53,7 @@ Enter your Client ID: `
 
 if (!config) error('Config not found. Please register this computer.');
 
-const client = new ClientAPI(config.clientId, config.masterKey, config.serverAddress);
+export const client = new ClientAPI(config.clientId, config.masterKey, config.serverAddress);
 
 // Initialize background P2P chat listener
 initChatListener(client);

@@ -1,12 +1,19 @@
 /** @noSelfInFile */
 
+/** Standard key, IV, salt, and digest byte lengths */
+export const SPECK_KEY_BYTES = 16;
+export const SPECK_IV_BYTES = 8;
+export const SALT_BYTES = 16;
+export const BLAKE2S_DIGEST_BYTES = 32;
+export const DEFAULT_KEY_DERIVATION_ROUNDS = 500;
+
 /** Rotate right (32-bit unsigned) */
-function rotr32(x: number, n: number): number {
+export function rotr32(x: number, n: number): number {
 	return ((x >>> n) | (x << (32 - n))) >>> 0;
 }
 
 /** Rotate left (32-bit unsigned) */
-function rotl32(x: number, n: number): number {
+export function rotl32(x: number, n: number): number {
 	return ((x << n) | (x >>> (32 - n))) >>> 0;
 }
 
@@ -85,11 +92,26 @@ export function generateRandomHex(byteCount: number): string {
 	return bytesToHex(bytes);
 }
 
+/** Generates a 128-bit (16-byte) random hex key suitable for SPECK-64/128 */
+export function generateKey(): string {
+	return generateRandomHex(SPECK_KEY_BYTES);
+}
+
+/** Generates a 64-bit (8-byte) random hex IV suitable for SPECK-64/128 CTR */
+export function generateIV(): string {
+	return generateRandomHex(SPECK_IV_BYTES);
+}
+
+/** Generates a 128-bit (16-byte) random hex salt */
+export function generateSalt(): string {
+	return generateRandomHex(SALT_BYTES);
+}
+
 /**
  * SPECK-64/128 key expansion algorithm.
  * Takes 128-bit key (4 x 32-bit words) and yields 27 round keys.
  */
-function speckExpandKey(k: number[]): number[] {
+export function speckExpandKey(k: number[]): number[] {
 	const roundKeys: number[] = [];
 	let l0 = k[1],
 		l1 = k[2],
@@ -107,7 +129,7 @@ function speckExpandKey(k: number[]): number[] {
 }
 
 /** Encrypts a single 64-bit block (two 32-bit words x, y) using SPECK-64/128 */
-function speckEncryptBlock(x: number, y: number, rk: number[]): [number, number] {
+export function speckEncryptBlock(x: number, y: number, rk: number[]): [number, number] {
 	for (let i = 0; i < 27; i++) {
 		x = ((rotr32(x, 8) + y) >>> 0) ^ rk[i];
 		y = rotl32(y, 3) ^ x;
@@ -123,8 +145,8 @@ export function speckCTR(dataBytes: number[], keyHex: string, ivHex: string): nu
 	const keyBytes = hexToBytes(keyHex);
 	const ivBytes = hexToBytes(ivHex);
 
-	if (keyBytes.length !== 16) throw new Error('SPECK-64/128 requires a 128-bit (16 byte) key.');
-	if (ivBytes.length !== 8) throw new Error('SPECK-64/128 CTR requires an 8-byte IV.');
+	if (keyBytes.length !== SPECK_KEY_BYTES) throw new Error('SPECK-64/128 requires a 128-bit (16 byte) key.');
+	if (ivBytes.length !== SPECK_IV_BYTES) throw new Error('SPECK-64/128 CTR requires an 8-byte IV.');
 
 	// Parse 128-bit key into 4 x 32-bit words (Little Endian)
 	const k = [
@@ -285,7 +307,11 @@ function compress(ctx: number[], block: number[], counter: number, isLast: boole
  * Derives a 128-bit Key Encryption Key (KEK) from a passphrase and salt.
  * Performs iterated BLAKE2s passes to slow down offline password cracking attempts.
  */
-export function deriveKey(passphrase: string, saltHex: string, rounds = 500): string {
+export function deriveKey(
+	passphrase: string,
+	saltHex: string,
+	rounds = DEFAULT_KEY_DERIVATION_ROUNDS
+): string {
 	let hash = blake2s(passphrase + saltHex);
 	for (let i = 0; i < rounds; i++) {
 		hash = blake2s(hash + saltHex);
