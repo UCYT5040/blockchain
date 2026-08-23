@@ -4,10 +4,15 @@
 	"type": "module",
 	"scripts": {
 		"format": "prettier --write .",
-		"format:check": "prettier --check ."
+		"format:check": "prettier --check .",
+		"docs:client": "tsdoc --types --dest=web/src/routes/docs/client/+page.md --src=cc/src/scripts/client/*",
+		"docs:crypto": "tsdoc --types --dest=web/src/routes/docs/crypto/+page.md --src=cc/src/scripts/crypto/*",
+		"docs:protocol": "tsdoc --types --dest=web/src/routes/docs/protocol/+page.md --src=cc/src/scripts/protocol/*",
+		"docs": "npm run docs:client && npm run docs:crypto && npm run docs:protocol"
 	},
 	"devDependencies": {
 		"prettier": "^3.8.3",
-		"prettier-plugin-svelte": "^4.1.0"
+		"prettier-plugin-svelte": "^4.1.0",
+		"tsdoc-markdown": "^1.5.0"
 	}
 }

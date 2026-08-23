@@ -4,4 +4,14 @@
 
 # BlockChain Docs
 
+## APIs
+
+All computers on the server come pre-equipped with three APIs:
+
+- [`client`](/docs/client): Most useful. Used for sending requests, P2P messaging, and transactions.
+- [`crypto`](/docs/crypto): Basic crypto functions.
+- [`protocol`](/docs/protocol): Low-level networking functions.
+
+## FAQ
+
 <FAQ />

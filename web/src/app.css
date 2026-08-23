@@ -28,3 +28,35 @@ body {
 	background-color: #000000;
 	color: white;
 }
+
+a {
+	color: #3366cc;
+	cursor: pointer;
+}
+
+a:hover {
+	color: #4c99b2;
+}
+
+code {
+	color: #7fcc19;
+	font-family: inherit;
+	font-size: 0.9em;
+	background-color: var(--background-color);
+	padding: 0.2em 0.4em;
+	text-decoration-color: #7fcc19;
+}
+
+summary {
+    color: #3366cc;
+	cursor: pointer;
+	margin-left: -1.5em;
+}
+
+summary:hover, details[open] summary {
+    color: #4c99b2;
+}
+ 
+details {
+	margin-left: 1.5em;
+}

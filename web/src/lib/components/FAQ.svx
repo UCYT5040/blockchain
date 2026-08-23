@@ -43,6 +43,7 @@ Other requirements:
 - Project must be publicly shared (preferably on GitHub)
 - An organized release (through GitHub Releases) <!-- TODO: Link to a release guide -->
 - A README explaining how to use the project
+
 </details>
 
 <details>
@@ -65,6 +66,7 @@ Other requirements:
 - Project must be publicly shared (preferably on GitHub)
 - An organized release (either through BlockChain Scripts, or GitHub Releases) <!-- TODO: Add a link to BlockChain Scripts -->
 - A README explaining how to use the project
+
 </details>
 
 <details>

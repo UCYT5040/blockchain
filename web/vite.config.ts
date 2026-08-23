@@ -2,6 +2,9 @@ import adapter from '@sveltejs/adapter-auto';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import { mdsvex } from 'mdsvex';
+import remarkEmoji from 'remark-emoji';
+import remarkSlug from 'remark-slug';
+import remarkAutolinkHeadings from 'remark-autolink-headings';
 
 export default defineConfig({
 	plugins: [
@@ -20,7 +23,11 @@ export default defineConfig({
 			extensions: ['.svelte', '.svx', '.md'],
 			preprocess: [
 				mdsvex({
-					extensions: ['.svx', '.md']
+					extensions: ['.svx', '.md'],
+					remarkPlugins: [
+						// @ts-expect-error MDSveX expects legacy types
+						remarkSlug, remarkAutolinkHeadings, remarkEmoji
+					]
 				})
 			]
 		})
