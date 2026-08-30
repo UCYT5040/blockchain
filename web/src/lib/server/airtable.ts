@@ -3,7 +3,8 @@ import {
 	AIRTABLE_BASE,
 	AIRTABLE_TABLE_COMPUTERS,
 	AIRTABLE_TABLE_USERS,
-	AIRTABLE_TABLE_CURRENCY
+	AIRTABLE_TABLE_CURRENCY,
+	AIRTABLE_TABLE_PLAYERS
 } from '$env/static/private';
 import Airtable, { type FieldSet, type Record as AirtableRecord, type Records } from 'airtable';
 
@@ -32,9 +33,15 @@ export interface ComputerFields extends FieldSet {
 	'Slack ID (from Owner)'?: string[];
 }
 
+export interface PlayerFields extends FieldSet {
+	Username: string;
+	'Got Beginner Gift'?: boolean;
+}
+
 export type UserRecord = AirtableRecord<UserFields>;
 export type ComputerRecord = AirtableRecord<ComputerFields>;
 export type CurrencyRecord = AirtableRecord<CurrencyRecordFields>;
+export type PlayerRecord = AirtableRecord<PlayerFields>;
 
 export interface UserData extends UserFields {
 	id: string;
@@ -43,6 +50,7 @@ export interface UserData extends UserFields {
 export const users = base.table<UserFields>(AIRTABLE_TABLE_USERS);
 export const computers = base.table<ComputerFields>(AIRTABLE_TABLE_COMPUTERS);
 export const currency = base.table<CurrencyRecordFields>(AIRTABLE_TABLE_CURRENCY);
+export const players = base.table<PlayerFields>(AIRTABLE_TABLE_PLAYERS);
 
 interface UserProfileSync {
 	slackId: string;
@@ -224,4 +232,29 @@ export async function updateCurrencyByTransactionId(
 	}
 
 	await currency.update(currencyRecord.id, fields);
+}
+
+export async function getPlayerByUsername(username: string): Promise<PlayerRecord | null> {
+	const existingPlayers = await players
+		.select({
+			maxRecords: 1,
+			filterByFormula: `{Username} = "${username}"`
+		})
+		.firstPage();
+	if (existingPlayers.length === 0) {
+		return null;
+	}
+	return existingPlayers[0];
+}
+
+export async function upsertPlayerByUsername(username: string, fields: Partial<PlayerFields>): Promise<void> {
+	const existingPlayer = await getPlayerByUsername(username);
+	if (existingPlayer) {
+		await players.update(existingPlayer.id, fields);
+	} else {
+		await players.create({
+			Username: username,
+			...fields
+		});
+	}
 }
