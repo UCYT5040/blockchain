@@ -61,16 +61,34 @@ for (const scriptName of toBuild) {
 
 	console.log(`Building ${scriptName}...`);
 	try {
-		const tstlBin = path.join(
-			__dirname,
-			'node_modules',
-			'.bin',
-			process.platform === 'win32' ? 'tstl.cmd' : 'tstl'
-		);
-		const cmd = fs.existsSync(tstlBin)
-			? `"${tstlBin}" -p "tsconfig.json"`
-			: `npx tstl -p "tsconfig.json"`;
-		execSync(cmd, { stdio: 'inherit', cwd: scriptDirPath, shell: true });
+		let tstlScript;
+		try {
+			tstlScript = require.resolve('@jackmacwindows/typescript-to-lua/dist/tstl.js', { paths: [__dirname] });
+		} catch {
+			try {
+				tstlScript = require.resolve('typescript-to-lua/dist/tstl.js', { paths: [__dirname] });
+			} catch {
+				tstlScript = null;
+			}
+		}
+
+		if (tstlScript) {
+			execSync(`"${process.execPath}" "${tstlScript}" -p "tsconfig.json"`, {
+				stdio: 'inherit',
+				cwd: scriptDirPath
+			});
+		} else {
+			const tstlBin = path.join(
+				__dirname,
+				'node_modules',
+				'.bin',
+				process.platform === 'win32' ? 'tstl.cmd' : 'tstl'
+			);
+			const cmd = fs.existsSync(tstlBin)
+				? `"${tstlBin}" -p "tsconfig.json"`
+				: `npx tstl -p "tsconfig.json"`;
+			execSync(cmd, { stdio: 'inherit', cwd: scriptDirPath, shell: true });
+		}
 		console.log(`✓ Built dist/${scriptName}.lua`);
 	} catch (err) {
 		console.error(`✕ Failed to build ${scriptName}`);
