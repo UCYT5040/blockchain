@@ -18,7 +18,7 @@ A demo is available [here](https://blockchain-ysws.vercel.app/).
 
 The server token is `abc123`. Go ahead and abuse it.
 
-## CompturCraft: Tweaked Scripts
+## ComputerCraft: Tweaked Scripts
 
 The latest version of the scripts are available through a GitHub release. You'll need to setup a world with the mods to run them.
 
