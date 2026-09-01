@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { messagesOfTheDay } from '$lib/motd';
 
 export const GET: RequestHandler = ({ params, url }) => {
-	const motdData = messagesOfTheDay[params.message as keyof typeof messagesOfTheDay];
+	const motdData = messagesOfTheDay[(params.message ?? "small") as keyof typeof messagesOfTheDay];
 
 	const isCC = url.searchParams.get('format') === 'cc';
 
