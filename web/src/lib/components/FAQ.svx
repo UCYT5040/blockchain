@@ -55,19 +55,6 @@ If you use AI, you must do so responsibly. Projects with AI use will be held to 
 </details>
 
 <details>
-<summary>What are project requirements?</summary>
-
-You must track your time using [Hackatime](https://hackatime.hackclub.com/).
-
-Other requirements:
-- A video demo
-- Project must be publicly shared (preferably on GitHub)
-- An organized release (either through BlockChain Scripts, or GitHub Releases) <!-- TODO: Add a link to BlockChain Scripts -->
-- A README explaining how to use the project
-
-</details>
-
-<details>
 <summary>What languages can I use?</summary>
 
 Lua directly runs on ComputerCraft, so it's a great option.
