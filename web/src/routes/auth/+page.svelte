@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { authClient } from '$lib/auth-client';
 	import PixelButton from '$lib/components/PixelButton.svelte';
 	import PixelWindow from '$lib/components/PixelWindow.svelte';
@@ -13,6 +14,10 @@
 				<h1>Account</h1>
 				<p>
 					{$session.data.user.name}
+				</p>
+				<p>
+					Trying to access your projects? That feature is coming soon. In the meantime, check out
+					the <a href={resolve('/docs')}>docs</a>!
 				</p>
 				<PixelButton
 					onclick={async () => {
