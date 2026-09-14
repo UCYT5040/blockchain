@@ -7,7 +7,6 @@ import { sveltekitCookies } from 'better-auth/svelte-kit';
 import { upsertUser } from './airtable';
 
 export const auth = betterAuth({
-	baseURL: 'http://localhost:5173', // TODO: Update or use env var or perhaps some Vite utility?
 	user: {
 		additionalFields: {
 			slackId: {
