@@ -55,3 +55,7 @@ This server handles all the client communications, such as getting the MOTD or i
 ## Modpack
 
 A modpack file was included which you can import into Modrinth. It has all the addon mods along with a few QOL mods.
+
+## Run Instructions
+
+See `package.json` within `web/` and `cc/` for the respective dev/build scripts.
