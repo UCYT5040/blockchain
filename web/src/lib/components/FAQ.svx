@@ -18,6 +18,19 @@ Yes, BlockChain is a legit program ~~run by~~ (soon to be run by) [Hack Club](ht
 Join the <a href="https://hackclub.com/slack">Hack Club Slack</a> and ask for help in the #block-chain channel.
 </details>
 
+<details>
+<summary>Can I play without Minecraft?</summary>
+
+BlockChain is best enjoyed with Minecraft, but you don't need it to start.
+
+Join BlockChain as a **trial player**:
+
+1. Create programs on a ComputerCraft emulator
+2. Submit 6h of work
+3. Get a Minecraft license!
+
+</details>
+
 ### Projects
 
 <details>
