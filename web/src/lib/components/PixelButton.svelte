@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, type Snippet } from 'svelte';
+	import type { Snippet } from 'svelte';
 	import type { SvelteHTMLElements } from 'svelte/elements';
 	import PixelBackground from './PixelBackground.svelte';
 
@@ -11,31 +11,10 @@
 	}
 
 	let { class: className, advanced = false, children, ...otherProps }: Props = $props();
-
-	let buttonElement: HTMLButtonElement | null = $state(null);
-
-	let width: number | undefined = $state(undefined);
-	let height: number | undefined = $state(undefined);
-
-	function updateSize() {
-		if (!buttonElement) {
-			return;
-		}
-		const { width: newWidth, height: newHeight } = buttonElement.getBoundingClientRect();
-		width = newWidth;
-		height = newHeight;
-	}
-
-	onMount(updateSize);
 </script>
 
-<button
-	{...otherProps}
-	class={`pixel-button ${className ?? ''}`}
-	bind:this={buttonElement}
-	onresize={updateSize}
->
-	<PixelBackground {advanced} {width} {height} class="pixel-button-background" />
+<button {...otherProps} class={`pixel-button ${className ?? ''}`}>
+	<PixelBackground {advanced} class="pixel-button-background" />
 	{@render children()}
 </button>
 

@@ -1,15 +1,20 @@
 <script lang="ts">
-	import type { SvelteHTMLElements } from 'svelte/elements';
+	import type { HTMLAttributes } from 'svelte/elements';
 
-	type SVGProps = SvelteHTMLElements['svg'];
-
-	interface Props extends SVGProps {
+	interface Props extends HTMLAttributes<HTMLDivElement> {
 		advanced?: boolean;
-		width?: number;
-		height?: number;
+		width?: number | string;
+		height?: number | string;
 	}
 
-	let { advanced = false, width = 600, height = 400, ...otherProps }: Props = $props();
+	let {
+		advanced = false,
+		width,
+		height,
+		class: className,
+		style: customStyle,
+		...otherProps
+	}: Props = $props();
 
 	interface Rect {
 		x: number;
@@ -19,9 +24,7 @@
 		style: string;
 	}
 
-	const cornerSize = 24;
-
-	const corners: Record<string, Rect[]> = {
+	const corners: Record<'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight', Rect[]> = {
 		topLeft: [
 			{
 				x: 4,
@@ -389,105 +392,287 @@
 		]
 	};
 
+	const topEdgeRects: Rect[] = [
+		{ x: 0, y: 0, width: 1, height: 2, style: 'border' },
+		{ x: 0, y: 2, width: 1, height: 4, style: 'border-top-left' },
+		{ x: 0, y: 6, width: 1, height: 14, style: 'border-main' },
+		{ x: 0, y: 20, width: 1, height: 2, style: 'border-inner-top-left' },
+		{ x: 0, y: 22, width: 1, height: 2, style: 'border' }
+	];
+
+	const bottomEdgeRects: Rect[] = [
+		{ x: 0, y: 0, width: 1, height: 2, style: 'border' },
+		{ x: 0, y: 2, width: 1, height: 2, style: 'border-inner-bottom-right' },
+		{ x: 0, y: 4, width: 1, height: 14, style: 'border-main' },
+		{ x: 0, y: 18, width: 1, height: 4, style: 'border-bottom-right' },
+		{ x: 0, y: 22, width: 1, height: 2, style: 'border' }
+	];
+
+	const leftEdgeRects: Rect[] = [
+		{ x: 0, y: 0, width: 2, height: 1, style: 'border' },
+		{ x: 2, y: 0, width: 4, height: 1, style: 'border-top-left' },
+		{ x: 6, y: 0, width: 14, height: 1, style: 'border-main' },
+		{ x: 20, y: 0, width: 2, height: 1, style: 'border-inner-top-left' },
+		{ x: 22, y: 0, width: 2, height: 1, style: 'border' }
+	];
+
+	const rightEdgeRects: Rect[] = [
+		{ x: 0, y: 0, width: 2, height: 1, style: 'border' },
+		{ x: 2, y: 0, width: 2, height: 1, style: 'border-inner-bottom-right' },
+		{ x: 4, y: 0, width: 14, height: 1, style: 'border-main' },
+		{ x: 18, y: 0, width: 4, height: 1, style: 'border-bottom-right' },
+		{ x: 22, y: 0, width: 2, height: 1, style: 'border' }
+	];
+
 	const noTypePrefix = ['border', 'background', 'corner'];
 
-	function corner(
-		corner: 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight',
-		x: number,
-		y: number
-	): Rect[] {
-		return corners[corner].map((rect) => {
-			const hasTypePrefix = !noTypePrefix.includes(rect.style);
-			const finalStyle = `${hasTypePrefix ? (advanced ? 'advanced-' : 'basic-') : ''}${rect.style}`;
-			return {
-				x: rect.x + x,
-				y: rect.y + y,
-				width: rect.width,
-				height: rect.height,
-				style: finalStyle
-			};
-		});
-	}
-
-	function createRect(
-		direction: 'horizontal' | 'vertical',
-		offset: number,
-		size: number,
-		style: string
-	): Rect {
+	function getFill(style: string) {
 		const hasTypePrefix = !noTypePrefix.includes(style);
 		const finalStyle = `${hasTypePrefix ? (advanced ? 'advanced-' : 'basic-') : ''}${style}`;
-		if (direction === 'horizontal') {
-			return {
-				x: cornerSize,
-				y: offset,
-				width: width - 2 * cornerSize,
-				height: size,
-				style: finalStyle
-			};
-		} else {
-			return {
-				x: offset,
-				y: cornerSize,
-				width: size,
-				height: height - 2 * cornerSize,
-				style: finalStyle
-			};
-		}
+		return `var(--${finalStyle}-color)`;
 	}
 
-	let rects: Rect[] = $derived.by(() => {
-		const rightOffset = width - cornerSize;
-		const bottomOffset = height - cornerSize;
-		return [
-			// Left
-			createRect('vertical', 0, 2, 'border'),
-			createRect('vertical', 2, 4, 'border-top-left'),
-			createRect('vertical', 6, 14, 'border-main'),
-			createRect('vertical', 20, 2, 'border-inner-top-left'),
-			createRect('vertical', 22, 2, 'border'),
-			// Top
-			createRect('horizontal', 0, 2, 'border'),
-			createRect('horizontal', 2, 4, 'border-top-left'),
-			createRect('horizontal', 6, 14, 'border-main'),
-			createRect('horizontal', 20, 2, 'border-inner-top-left'),
-			createRect('horizontal', 22, 2, 'border'),
-			// Right
-			createRect('vertical', rightOffset, 2, 'border'),
-			createRect('vertical', rightOffset + 2, 2, 'border-inner-bottom-right'),
-			createRect('vertical', rightOffset + 4, 14, 'border-main'),
-			createRect('vertical', rightOffset + 18, 4, 'border-bottom-right'),
-			createRect('vertical', rightOffset + 22, 2, 'border'),
-			// Bottom
-			createRect('horizontal', bottomOffset, 2, 'border'),
-			createRect('horizontal', bottomOffset + 2, 2, 'border-inner-bottom-right'),
-			createRect('horizontal', bottomOffset + 4, 14, 'border-main'),
-			createRect('horizontal', bottomOffset + 18, 4, 'border-bottom-right'),
-			createRect('horizontal', bottomOffset + 22, 2, 'border'),
-			// Corners
-			...corner('topLeft', 0, 0),
-			...corner('topRight', width - cornerSize, 0),
-			...corner('bottomLeft', 0, height - cornerSize),
-			...corner('bottomRight', width - cornerSize, height - cornerSize),
-			{
-				x: cornerSize,
-				y: cornerSize,
-				width: width - 2 * cornerSize,
-				height: height - 2 * cornerSize,
-				style: 'background'
-			}
-		];
+	let computedStyle = $derived.by(() => {
+		const styles: string[] = [];
+		if (width !== undefined) {
+			styles.push(`width: ${typeof width === 'number' ? `${width}px` : width}`);
+		}
+		if (height !== undefined) {
+			styles.push(`height: ${typeof height === 'number' ? `${height}px` : height}`);
+		}
+		if (customStyle) {
+			styles.push(customStyle);
+		}
+		return styles.length > 0 ? styles.join('; ') : undefined;
 	});
 </script>
 
-<svg {width} {height} {...otherProps}>
-	{#each rects as rect, i (i)}
-		<rect
-			x={rect.x}
-			y={rect.y}
-			width={rect.width}
-			height={rect.height}
-			style={`fill: var(--${rect.style}-color)`}
-		/>
-	{/each}
-</svg>
+<div
+	{...otherProps}
+	class={`pixel-background ${className ?? ''}`}
+	style={computedStyle}
+	aria-hidden="true"
+>
+	<!-- Corners -->
+	<svg
+		class="pixel-corner pixel-corner-tl"
+		viewBox="0 0 24 24"
+		width="24"
+		height="24"
+		shape-rendering="crispEdges"
+	>
+		{#each corners.topLeft as rect}
+			<rect
+				x={rect.x}
+				y={rect.y}
+				width={rect.width}
+				height={rect.height}
+				fill={getFill(rect.style)}
+			/>
+		{/each}
+	</svg>
+	<svg
+		class="pixel-corner pixel-corner-tr"
+		viewBox="0 0 24 24"
+		width="24"
+		height="24"
+		shape-rendering="crispEdges"
+	>
+		{#each corners.topRight as rect}
+			<rect
+				x={rect.x}
+				y={rect.y}
+				width={rect.width}
+				height={rect.height}
+				fill={getFill(rect.style)}
+			/>
+		{/each}
+	</svg>
+	<svg
+		class="pixel-corner pixel-corner-bl"
+		viewBox="0 0 24 24"
+		width="24"
+		height="24"
+		shape-rendering="crispEdges"
+	>
+		{#each corners.bottomLeft as rect}
+			<rect
+				x={rect.x}
+				y={rect.y}
+				width={rect.width}
+				height={rect.height}
+				fill={getFill(rect.style)}
+			/>
+		{/each}
+	</svg>
+	<svg
+		class="pixel-corner pixel-corner-br"
+		viewBox="0 0 24 24"
+		width="24"
+		height="24"
+		shape-rendering="crispEdges"
+	>
+		{#each corners.bottomRight as rect}
+			<rect
+				x={rect.x}
+				y={rect.y}
+				width={rect.width}
+				height={rect.height}
+				fill={getFill(rect.style)}
+			/>
+		{/each}
+	</svg>
+
+	<!-- Edges -->
+	<svg
+		class="pixel-edge pixel-edge-top"
+		viewBox="0 0 1 24"
+		preserveAspectRatio="none"
+		shape-rendering="crispEdges"
+	>
+		{#each topEdgeRects as rect}
+			<rect
+				x={rect.x}
+				y={rect.y}
+				width={rect.width}
+				height={rect.height}
+				fill={getFill(rect.style)}
+			/>
+		{/each}
+	</svg>
+	<svg
+		class="pixel-edge pixel-edge-bottom"
+		viewBox="0 0 1 24"
+		preserveAspectRatio="none"
+		shape-rendering="crispEdges"
+	>
+		{#each bottomEdgeRects as rect}
+			<rect
+				x={rect.x}
+				y={rect.y}
+				width={rect.width}
+				height={rect.height}
+				fill={getFill(rect.style)}
+			/>
+		{/each}
+	</svg>
+	<svg
+		class="pixel-edge pixel-edge-left"
+		viewBox="0 0 24 1"
+		preserveAspectRatio="none"
+		shape-rendering="crispEdges"
+	>
+		{#each leftEdgeRects as rect}
+			<rect
+				x={rect.x}
+				y={rect.y}
+				width={rect.width}
+				height={rect.height}
+				fill={getFill(rect.style)}
+			/>
+		{/each}
+	</svg>
+	<svg
+		class="pixel-edge pixel-edge-right"
+		viewBox="0 0 24 1"
+		preserveAspectRatio="none"
+		shape-rendering="crispEdges"
+	>
+		{#each rightEdgeRects as rect}
+			<rect
+				x={rect.x}
+				y={rect.y}
+				width={rect.width}
+				height={rect.height}
+				fill={getFill(rect.style)}
+			/>
+		{/each}
+	</svg>
+
+	<!-- Center -->
+	<div class="pixel-center"></div>
+</div>
+
+<style>
+	.pixel-background {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		overflow: hidden;
+	}
+
+	.pixel-corner,
+	.pixel-edge {
+		position: absolute;
+		display: block;
+	}
+
+	.pixel-corner-tl {
+		top: 0;
+		left: 0;
+		width: 24px;
+		height: 24px;
+	}
+
+	.pixel-corner-tr {
+		top: 0;
+		right: 0;
+		width: 24px;
+		height: 24px;
+	}
+
+	.pixel-corner-bl {
+		bottom: 0;
+		left: 0;
+		width: 24px;
+		height: 24px;
+	}
+
+	.pixel-corner-br {
+		bottom: 0;
+		right: 0;
+		width: 24px;
+		height: 24px;
+	}
+
+	.pixel-edge-top {
+		top: 0;
+		left: 24px;
+		right: 24px;
+		height: 24px;
+		width: calc(100% - 48px);
+	}
+
+	.pixel-edge-bottom {
+		bottom: 0;
+		left: 24px;
+		right: 24px;
+		height: 24px;
+		width: calc(100% - 48px);
+	}
+
+	.pixel-edge-left {
+		top: 24px;
+		bottom: 24px;
+		left: 0;
+		width: 24px;
+		height: calc(100% - 48px);
+	}
+
+	.pixel-edge-right {
+		top: 24px;
+		bottom: 24px;
+		right: 0;
+		width: 24px;
+		height: calc(100% - 48px);
+	}
+
+	.pixel-center {
+		position: absolute;
+		top: 24px;
+		bottom: 24px;
+		left: 24px;
+		right: 24px;
+		background-color: var(--background-color);
+	}
+</style>

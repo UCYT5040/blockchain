@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, type Snippet } from 'svelte';
+	import type { Snippet } from 'svelte';
 	import type { SvelteHTMLElements } from 'svelte/elements';
 	import PixelBackground from './PixelBackground.svelte';
 
@@ -11,31 +11,10 @@
 	}
 
 	let { class: className, advanced = false, children, ...otherProps }: Props = $props();
-
-	let divElement: HTMLDivElement | null = $state(null);
-
-	let width: number | undefined = $state(undefined);
-	let height: number | undefined = $state(undefined);
-
-	function updateSize() {
-		if (!divElement) {
-			return;
-		}
-		const { width: newWidth, height: newHeight } = divElement.getBoundingClientRect();
-		width = newWidth;
-		height = newHeight;
-	}
-
-	onMount(updateSize);
 </script>
 
-<div
-	{...otherProps}
-	class={`pixel-window ${className ?? ''}`}
-	bind:this={divElement}
-	onresize={updateSize}
->
-	<PixelBackground {advanced} {width} {height} class="pixel-window-background" />
+<div {...otherProps} class={`pixel-window ${className ?? ''}`}>
+	<PixelBackground {advanced} class="pixel-window-background" />
 	{@render children()}
 </div>
 
