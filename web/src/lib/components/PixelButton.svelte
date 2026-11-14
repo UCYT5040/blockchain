@@ -33,6 +33,11 @@
 		cursor: pointer;
 	}
 
+	.pixel-button:disabled {
+		cursor: not-allowed;
+		filter: grayscale(1) brightness(0.8);
+	}
+
 	:global(.pixel-button-background) {
 		position: absolute;
 		inset: 0;
