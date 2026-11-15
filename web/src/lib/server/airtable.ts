@@ -25,6 +25,7 @@ export interface UserFields extends FieldSet {
 	'Verification Status'?: string;
 	'YSWS Eligible'?: boolean;
 	Currency?: number;
+	'Is Admin': boolean;
 }
 
 export interface ComputerFields extends FieldSet {
