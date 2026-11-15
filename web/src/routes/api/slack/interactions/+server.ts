@@ -19,7 +19,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	const payload = JSON.parse(payloadRaw);
 	const action = payload.actions?.[0];
 
-	if (payload.type === 'block_actions' && action?.action_id === 'rsvp_out_out') {
+	if (payload.type === 'block_actions' && action?.action_id === 'rsvp_opt_out') {
 		const slackId = action.value;
 
 		if (slackId) {
