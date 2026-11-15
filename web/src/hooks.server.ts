@@ -4,6 +4,16 @@ import { svelteKitHandler } from 'better-auth/svelte-kit';
 import { building } from '$app/environment';
 
 export const handle: Handle = async ({ event, resolve }) => {
+	// Re-enable CSRF
+	if (
+		event.request.method === 'POST' &&
+		!event.url.pathname.startsWith('/api/slack/') &&
+		event.request.headers.get('content-type')?.includes('application/x-www-form-urlencoded') &&
+		event.request.headers.get('origin') !== event.url.origin
+	) {
+		return new Response('Forbidden', { status: 403 });
+	}
+
 	const session = await auth.api.getSession({
 		headers: event.request.headers
 	});

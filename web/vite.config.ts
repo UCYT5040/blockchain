@@ -26,10 +26,18 @@ export default defineConfig({
 					extensions: ['.svx', '.md'],
 					remarkPlugins: [
 						// @ts-expect-error MDSveX expects legacy types
-						remarkSlug, remarkAutolinkHeadings, remarkEmoji
+						remarkSlug,
+						// @ts-expect-error MDSveX expects legacy types
+						remarkAutolinkHeadings,
+						// @ts-expect-error MDSveX expects legacy types
+						remarkEmoji
 					]
 				})
-			]
+			],
+
+			csrf: {
+				checkOrigin: false
+			}
 		})
 	]
 });
