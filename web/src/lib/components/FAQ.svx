@@ -1,3 +1,7 @@
+<script lang="ts">
+  import CurrencyIcon from '$lib/components/icons/CurrencyIcon.svelte';
+</script>
+
 ### General
 
 <details>
@@ -80,7 +84,7 @@ TypeScript is officially supported. <!-- TODO: Add a link to a guide on TS -->
 <details>
 <summary>What are bounties?</summary>
 
-Bounties are rewards for completing certain projects. You can see a list of bounties on the project page, and suggest new bounties in Slack.
+Bounties are rewards for completing certain projects. You can see a list of bounties [here](/bounties), and suggest new bounties in Slack.
 
 Once someone claims a bounty, no one else can claim it, so be quick!
 
@@ -115,7 +119,7 @@ Bounty projects are still held to the expectations of a regular project.
 BlockChain has two forms of currency:
 
 <ol>
-  <li><img alt="Currency icon" src="/icons/currency.webp" width="20" /> <strong>Currency</strong> - An in-game currency used for trading between players, which has no real-world value.</li>
+  <li><CurrencyIcon /> <strong>Currency</strong> - An in-game currency used for trading between players, which has no real-world value.</li>
   <li><img alt="Token icon" src="/icons/token.webp" width="20" /> <strong>Tokens</strong> - Can be redeemed for real-world rewards! Cannot be traded.</li>
 </ol>
 

@@ -4,7 +4,8 @@ import {
 	AIRTABLE_TABLE_COMPUTERS,
 	AIRTABLE_TABLE_USERS,
 	AIRTABLE_TABLE_CURRENCY,
-	AIRTABLE_TABLE_PLAYERS
+	AIRTABLE_TABLE_PLAYERS,
+	AIRTABLE_TABLE_BOUNTIES
 } from '$env/static/private';
 import Airtable, { type FieldSet, type Record as AirtableRecord, type Records } from 'airtable';
 
@@ -38,10 +39,21 @@ export interface PlayerFields extends FieldSet {
 	'Got Beginner Gift'?: boolean;
 }
 
+export interface BountyFields extends FieldSet {
+	Name: string;
+	Claimed: boolean;
+	Reward: number;
+	Requirements: string;
+	'Claimed By'?: string[];
+	'Name (from Claimed By)'?: string[];
+	'Slack ID (from Claimed By)'?: string[];
+}
+
 export type UserRecord = AirtableRecord<UserFields>;
 export type ComputerRecord = AirtableRecord<ComputerFields>;
 export type CurrencyRecord = AirtableRecord<CurrencyRecordFields>;
 export type PlayerRecord = AirtableRecord<PlayerFields>;
+export type BountyRecord = AirtableRecord<BountyFields>;
 
 export interface UserData extends UserFields {
 	id: string;
@@ -51,6 +63,7 @@ export const users = base.table<UserFields>(AIRTABLE_TABLE_USERS);
 export const computers = base.table<ComputerFields>(AIRTABLE_TABLE_COMPUTERS);
 export const currency = base.table<CurrencyRecordFields>(AIRTABLE_TABLE_CURRENCY);
 export const players = base.table<PlayerFields>(AIRTABLE_TABLE_PLAYERS);
+export const bounties = base.table<BountyFields>(AIRTABLE_TABLE_BOUNTIES);
 
 interface UserProfileSync {
 	slackId: string;
@@ -247,7 +260,10 @@ export async function getPlayerByUsername(username: string): Promise<PlayerRecor
 	return existingPlayers[0];
 }
 
-export async function upsertPlayerByUsername(username: string, fields: Partial<PlayerFields>): Promise<void> {
+export async function upsertPlayerByUsername(
+	username: string,
+	fields: Partial<PlayerFields>
+): Promise<void> {
 	const existingPlayer = await getPlayerByUsername(username);
 	if (existingPlayer) {
 		await players.update(existingPlayer.id, fields);
@@ -257,4 +273,9 @@ export async function upsertPlayerByUsername(username: string, fields: Partial<P
 			...fields
 		});
 	}
+}
+
+export async function getBounties(): Promise<Records<BountyFields>> {
+	const bountyResults = await bounties.select({}).all();
+	return bountyResults;
 }
