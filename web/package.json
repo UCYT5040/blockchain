@@ -36,6 +36,7 @@
 		"vite": "^8.0.16"
 	},
 	"dependencies": {
+		"@slack/web-api": "^8.4.0",
 		"airtable": "^0.12.2",
 		"better-auth": "^1.6.26",
 		"nanoid": "^6.0.1"

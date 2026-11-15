@@ -25,6 +25,7 @@ export interface UserFields extends FieldSet {
 	'Verification Status'?: string;
 	'YSWS Eligible'?: boolean;
 	Currency?: number;
+	'Slack RSVP Opt Out': boolean;
 	'Is Admin': boolean;
 }
 
@@ -117,6 +118,20 @@ export async function upsertUser(data: UserProfileSync): Promise<void> {
 		await users.update(existingUser.id, airtableData);
 	} else {
 		await users.create(airtableData);
+	}
+}
+
+export async function setUsersRSVPOptOut(slackId: string): Promise<void> {
+	const existingUser = await getUserBySlackID(slackId);
+	if (!existingUser) {
+		await users.create({
+			'Slack ID': slackId,
+			'Slack RSVP Opt Out': true
+		});
+	} else {
+		await users.update(existingUser.id, {
+			'Slack RSVP Opt Out': true
+		});
 	}
 }
 

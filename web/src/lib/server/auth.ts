@@ -1,5 +1,9 @@
 import { getRequestEvent } from '$app/server';
-import { HACKCLUB_AUTH_CLIENT_ID, HACKCLUB_AUTH_CLIENT_SECRET } from '$env/static/private';
+import {
+	HACKCLUB_AUTH_CLIENT_ID,
+	HACKCLUB_AUTH_CLIENT_SECRET,
+	BETTER_AUTH_URL
+} from '$env/static/private';
 import { betterAuth } from 'better-auth';
 import { createAuthMiddleware } from 'better-auth/api';
 import { genericOAuth } from 'better-auth/plugins';
@@ -7,6 +11,7 @@ import { sveltekitCookies } from 'better-auth/svelte-kit';
 import { upsertUser } from './airtable';
 
 export const auth = betterAuth({
+	baseURL: BETTER_AUTH_URL,
 	user: {
 		additionalFields: {
 			slackId: {
